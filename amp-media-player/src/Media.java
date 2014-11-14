@@ -9,4 +9,24 @@ public class Media {
 	public void playMedia(String file) {
 		
 	}
+	
+	public void pause() {
+		
+	}
+	
+	public void resume() {
+		
+	}
+	
+	public long getTimestamp() {
+		return 0;
+	}
+	
+	public void setTimeStamp() {
+		
+	}
+	
+	public String getFileName() {
+		return fileName;
+	}
 }
