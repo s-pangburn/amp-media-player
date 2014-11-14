@@ -2,6 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jre8/lib/ext/jfxrt.jar"/>
+	<classpathentry kind="lib" path="lib/jars/jna-3.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/jars/platform-3.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/jars/vlcj-3.0.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre8"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
