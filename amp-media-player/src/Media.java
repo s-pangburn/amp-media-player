@@ -1,5 +1,7 @@
 
-
+import uk.co.caprica.vlcj.binding.*;
+import uk.co.caprica.vlcj.player.*;
+import uk.co.caprica.vlcj.runtime.*;
 
 public class Media {
 	private String fileName;
