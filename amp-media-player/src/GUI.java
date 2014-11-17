@@ -108,9 +108,17 @@ public class GUI extends JFrame {
 		params.weighty = 1;
 		pane.add(display, params);
 		
-		JButton prevButton = new JButton("Prev");
+		JSlider slider = new JSlider(0, 150, 0);
 		params.gridx = 0;
 		params.gridy = 1;
+		params.weighty = 0;
+		params.gridwidth = 3;
+		params.fill = GridBagConstraints.BOTH;
+		pane.add(slider, params);
+		
+		JButton prevButton = new JButton("Prev");
+		params.gridx = 0;
+		params.gridy = 2;
 		params.insets = new Insets(5, 5, 5, 5);
 		params.gridheight = 1;
 		params.gridwidth = 1;
@@ -131,7 +139,7 @@ public class GUI extends JFrame {
 		
 		JButton playButton = new JButton("Play");
 		params.gridx = 1;
-		params.gridy = 1;
+		params.gridy = 2;
 		params.weightx = 0.5;
 		pane.add(playButton, params);
 		
@@ -144,7 +152,7 @@ public class GUI extends JFrame {
 		
 		JButton skipButton = new JButton("Next");
 		params.gridx = 2;
-		params.gridy = 1;
+		params.gridy = 2;
 		params.weightx = 0.5;
 		pane.add(skipButton, params);
 		
