@@ -1,45 +1,59 @@
 
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import uk.co.caprica.vlcj.binding.LibVlc;
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.MediaPlayerFactory;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
+
+
 public class Media {
+	public static final int TIMESTAMPMAX = 1000;
+	
 	private String fileName;
-	private EmbeddedMediaPlayerComponent player; 
+	private MediaPlayerFactory playerFactory; 
+	private EmbeddedMediaPlayer player;
+	private Canvas videoSurface;
 	
 	public void init() {
-		player = new EmbeddedMediaPlayerComponent();
+		videoSurface = new Canvas();
+		playerFactory = new MediaPlayerFactory();
+		player = playerFactory.newEmbeddedMediaPlayer();
+		player.setVideoSurface(playerFactory.newVideoSurface(videoSurface));
 	}
 	
-	public EmbeddedMediaPlayerComponent mediaPlayer() {
-		return player;
+	public Canvas mediaPlayer() {
+		return videoSurface;
 	}
 	
 	public void playMedia(String file) {
 		fileName = file;
-		player.getMediaPlayer().playMedia(file);
+		player.playMedia(file);
 	}
 	
 	public void pause() {
-		
+		player.pause();
 	}
 	
 	public void play() {
-		
+		player.play();
 	}
 	
-	public long getTimestamp() {
-		return 0;
+	public int getTimestamp() {
+		return (int)(player.getPosition() * TIMESTAMPMAX);
 	}
 	
-	public void setTimeStamp() {
-		
+	public void setTimeStamp(int pos) {
+		player.setPosition((float)pos / TIMESTAMPMAX);
 	}
 	
 	public String getFileName() {
@@ -58,7 +72,8 @@ public class Media {
                 Media media = new Media();
                 JFrame frame = new JFrame("test");
                 
-                frame.setContentPane(media.mediaPlayer());
+                
+                frame.add(media.mediaPlayer());
                 
                 frame.setLocation(100,100);
                 frame.setSize(1050,600);
@@ -72,9 +87,7 @@ public class Media {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-                media.mediaPlayer().paused(media.mediaPlayer().getMediaPlayer());
-                
-                media.playMedia("C:\\Users\\Public\\Videos\\Sample Videos\\Wildlife.wmv");
+                System.out.println("rewinding...");
                 
             }
         });
