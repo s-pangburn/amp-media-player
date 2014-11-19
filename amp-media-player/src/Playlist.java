@@ -178,6 +178,12 @@ public class Playlist {
 
 	}
 	
+	public void addMedia(String f) {
+		//Adds the fileName string into the Arraylist
+		playlist.add(f);
+		System.out.println("The media location '" + f + "' has been added to the Playlist.");
+	}
+	
 	public void setRepeat(boolean r) {
 		repeat = r;
 	}
@@ -190,6 +196,7 @@ public class Playlist {
 
 		Playlist test = new Playlist();
 		test.init();
+		test.addMedia("user.media.mp3");
 		test.savePlaylist();
 		test.loadPlaylist("file.xml");
 	}
