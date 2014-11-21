@@ -18,6 +18,8 @@ import javax.swing.plaf.metal.MetalSliderUI;
 
 public class GUI extends JFrame {
 	
+	private Playlist playlist;
+	
 	private class ToolBar extends JToolBar {
 		@Override
 		protected void paintComponent(Graphics g){
@@ -26,6 +28,7 @@ public class GUI extends JFrame {
 	}
 	
 	public GUI() {
+        playlist = new Playlist();
         init();
     }
 	
@@ -193,15 +196,23 @@ public class GUI extends JFrame {
 		toolbar.setFloatable(false);
 		pane.add(toolbar, params);
 		
-		String[] data = {"one", "two", "three", "four", "five","one", "two", "three", "four", "five","one", "two", "three", "four", "five", "one", "one"};
-		JList<String> playlist = new JList<String>(data);
+		String[] data = new String[playlist.getPlaylist().size()];
+		populateArrayFromList(data, playlist.getPlaylist());
+		
+		JList<String> plist = new JList<String>(data);
 		setConstraints(params, 5, 2, 3, 3, 0, 1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 10, 10, 10);
 		JScrollPane scroll = new JScrollPane();
-		scroll.getViewport().add(playlist);
+		scroll.getViewport().add(plist);
 		pane.add(scroll, params);
 		
 	}
+	
+	private <T> void populateArrayFromList(T[] arr, ArrayList<T> arrayList) {
+		for (int i = 0; i < arrayList.size(); i++) {
+			arr[i] = arrayList.get(i);
+		}
+    }
 
 
 	private void initSlider(JSlider slider) {

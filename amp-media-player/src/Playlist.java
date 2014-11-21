@@ -36,6 +36,10 @@ public class Playlist {
 	private boolean shuffle;
 	private boolean repeat;
 	
+	public Playlist() {
+		init();
+	}
+	
 	public void init() {
 		playlist = new ArrayList<String>();
 		shuffleQueue = new ArrayList<String>();
@@ -251,6 +255,10 @@ public class Playlist {
 	
 	public boolean getRepeat() {
 		return repeat;
+	}
+	
+	public ArrayList<String> getPlaylist() {
+		return playlist;
 	}
 
 	public static void main(String[] args) {
