@@ -244,6 +244,9 @@ public class Playlist {
 		}
 	}
 	
+	//TODO: moveItem
+	//TODO: Stephen will pass in a location and the file to be moved to that location 
+	//REMINDER: Make the actual index location - 1
 	
 	public void setRepeat(boolean r) {
 		repeat = r;
