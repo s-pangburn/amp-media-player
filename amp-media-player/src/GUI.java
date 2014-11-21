@@ -2,24 +2,33 @@
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Paint;
+import java.awt.SystemColor;
 import java.awt.event.*;
-import java.awt.BorderLayout;
+import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalSliderUI;
 
 public class GUI extends JFrame {
 	
-	/*
-	 * WARNING: MESSY-ASS CODE AHEAD
-	 * 
-	 * Mostly proof-of-concept. Will clean up later as I get familiar with Swing.'
-	 * 
-	 */
+	private Playlist playlist;
+	
+	private class ToolBar extends JToolBar {
+		@Override
+		protected void paintComponent(Graphics g){
+		    // Do nothing
+		}
+	}
 	
 	public GUI() {
+        playlist = new Playlist();
         init();
     }
 	
@@ -29,18 +38,15 @@ public class GUI extends JFrame {
 		pane.setLayout(new GridBagLayout());
 
 		drawMenu(pane);
-		drawDisplay(pane);
 		drawControls(pane);
+		drawPlaylist(pane);
 		
 		pack();
 		
 		setTitle("AMP Media Player");
-		setMinimumSize(new Dimension(460, 420));
+		setMinimumSize(new Dimension(650, 420));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-	}
-	
-	private void drawDisplay(Container pane) {
 	}
 	
 	private void drawMenu(Container pane) {
@@ -48,19 +54,11 @@ public class GUI extends JFrame {
 		//ImageIcon icon = new ImageIcon("XXXX.png");
 		
 		JMenu file = new JMenu("File");
-		file.setMnemonic(KeyEvent.VK_F);
 		
-		JMenuItem exit = new JMenuItem("Exit");//, icon);
+		JMenuItem exit = new JMenuItem("Exit");
 		exit.setToolTipText("Exits the application");
-		exit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				System.exit(0);
-			}
-		});
 		
 		JMenu edit = new JMenu("Edit");
-		file.setMnemonic(KeyEvent.VK_E);
 		
 		JMenuItem nothing = new JMenuItem("Nothing yet");
 		nothing.setToolTipText("This won't do anything");
@@ -86,49 +84,52 @@ public class GUI extends JFrame {
 		menu.add(filter);
 		
 		setJMenuBar(menu);
+
+		exit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				System.exit(0);
+			}
+		});
 	}
 
 	
-	/*
-	 * I plan to clean this up later, just trying to hash things out
-	 */
 	private void drawControls(Container pane) {
 		GridBagConstraints params = new GridBagConstraints();
 		
 		JPanel display = new JPanel();
 		display.setBackground(Color.black);
-		params.gridx = 0;
-		params.gridy = 0;
-		params.gridheight = 1;
-		params.gridwidth = 3;
-		params.insets = new Insets(10, 10, 10, 10);
-		params.anchor = GridBagConstraints.PAGE_START;
-		params.fill = GridBagConstraints.BOTH;
-		params.weightx = 1;
-		params.weighty = 1;
+		setConstraints(params, 0, 0, 3, 5, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+		params.insets = new Insets(10, 10, 2, 10);
 		pane.add(display, params);
 		
-		JSlider slider = new JSlider(0, 150, 0);
-		params.gridx = 0;
-		params.gridy = 1;
-		params.weighty = 0;
-		params.gridwidth = 3;
-		params.fill = GridBagConstraints.BOTH;
+		JSlider slider = new JSlider(0, 1000, 0);
+		setConstraints(params, 0, 3, 1, 5, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+		params.insets = new Insets(2, 10, 10, 10);
+		initSlider(slider);
 		pane.add(slider, params);
 		
+		JLabel blank1 = new JLabel("");
+		setConstraints(params, 0, 4, 1, 1, 1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		pane.add(blank1, params);
+		
 		JButton prevButton = new JButton("Prev");
-		params.gridx = 0;
-		params.gridy = 2;
+		setConstraints(params, 1, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(5, 5, 5, 5);
-		params.gridheight = 1;
-		params.gridwidth = 1;
-		params.fill = GridBagConstraints.HORIZONTAL;
-		params.weightx = 0.5;
-		params.weighty = 0;
-		params.anchor = GridBagConstraints.PAGE_END;
-		params.fill = GridBagConstraints.BOTH;
-		params.ipady = 0;
 		pane.add(prevButton, params);
+		
+		JButton playButton = new JButton("Play");
+		setConstraints(params, 2, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
+		pane.add(playButton, params);
+		
+		JButton skipButton = new JButton("Next");
+		setConstraints(params, 3, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
+		pane.add(skipButton, params);
+		
+		JLabel blank2 = new JLabel("");
+		setConstraints(params, 4, 4, 1, 1, 1, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
+		pane.add(blank2, params);
+
 		
 		prevButton.addActionListener(new ActionListener() {
 			@Override
@@ -137,24 +138,18 @@ public class GUI extends JFrame {
 			}
 		});
 		
-		JButton playButton = new JButton("Play");
-		params.gridx = 1;
-		params.gridy = 2;
-		params.weightx = 0.5;
-		pane.add(playButton, params);
-		
 		playButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				System.out.println("Play media");
+				if (playButton.getText() == "Play") {
+					playButton.setText("Pause");
+					System.out.println("Play media");
+				} else {
+					playButton.setText("Play");
+					System.out.println("Pause media");
+				}
 			}
 		});
-		
-		JButton skipButton = new JButton("Next");
-		params.gridx = 2;
-		params.gridy = 2;
-		params.weightx = 0.5;
-		pane.add(skipButton, params);
 		
 		skipButton.addActionListener(new ActionListener() {
 			@Override
@@ -162,6 +157,115 @@ public class GUI extends JFrame {
 				System.out.println("Go to next media");
 			}
 		});
+	}
+	
+	
+	private void drawPlaylist(Container pane) {
+		GridBagConstraints params = new GridBagConstraints();
+		
+		JLabel listTitle = new JLabel("Playlist Title");
+		setConstraints(params, 5, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		params.insets = new Insets(10, 10, 0, 0);
+		pane.add(listTitle, params);
+
+		JLabel blank1 = new JLabel("");
+		setConstraints(params, 6, 0, 1, 1, 0.1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		pane.add(blank1, params);
+		
+		JButton save = new JButton("Save");
+		setConstraints(params, 7, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		params.insets = new Insets(10, 10, 0, 11);
+		pane.add(save, params);
+		
+		ToolBar toolbar = new ToolBar();
+		setConstraints(params, 5, 1, 1, 3, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		params.insets = new Insets(0, 9, 0, 10);
+		JToggleButton shuffleButton = new JToggleButton("S");
+		toolbar.add(shuffleButton);
+		JToggleButton repeatButton = new JToggleButton("R");
+		toolbar.add(repeatButton);
+		toolbar.add(Box.createHorizontalGlue());
+		JButton newPlaylistButton = new JButton("New");
+		toolbar.add(newPlaylistButton);
+		JButton loadPlaylistButton = new JButton("Load");
+		toolbar.add(loadPlaylistButton);
+		JButton addPlaylistButton = new JButton("Add");
+		toolbar.add(addPlaylistButton);
+		JButton delPlaylistButton = new JButton("Del");
+		toolbar.add(delPlaylistButton);
+		toolbar.setFloatable(false);
+		pane.add(toolbar, params);
+		
+		String[] data = new String[playlist.getPlaylist().size()];
+		populateArrayFromList(data, playlist.getPlaylist());
+		
+		JList<String> plist = new JList<String>(data);
+		setConstraints(params, 5, 2, 3, 3, 0, 1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH);
+		params.insets = new Insets(0, 10, 10, 10);
+		JScrollPane scroll = new JScrollPane();
+		scroll.getViewport().add(plist);
+		pane.add(scroll, params);
+		
+	}
+	
+	private <T> void populateArrayFromList(T[] arr, ArrayList<T> arrayList) {
+		for (int i = 0; i < arrayList.size(); i++) {
+			arr[i] = arrayList.get(i);
+		}
+    }
+
+
+	private void initSlider(JSlider slider) {
+		/*
+		 * Sets the slider to jump to a position on-click
+		 */
+		slider.setUI(new MetalSliderUI() {
+			  protected TrackListener createTrackListener(JSlider slider) {
+				    return new TrackListener() {
+				      @Override public void mousePressed(MouseEvent e) {
+				        JSlider slider = (JSlider)e.getSource();
+				        switch (slider.getOrientation()) {
+				          case JSlider.VERTICAL:
+				            slider.setValue(valueForYPosition(e.getY()));
+				            break;
+				          case JSlider.HORIZONTAL:
+				            slider.setValue(valueForXPosition(e.getX()));
+				            break;
+				        }
+				        super.mousePressed(e); //isDragging = true;
+				        super.mouseDragged(e);
+				      }
+				      /*@Override public boolean shouldScroll(int direction) {
+				        return false;
+				      }*/
+				    };
+				  }
+		});
+	}
+
+
+	private void setConstraints(GridBagConstraints params, int x, int y, int height, 
+								int width, double weightx, double weighty) {
+		params.gridx = x;
+		params.gridy = y;
+		params.gridheight = height;
+		params.gridwidth = width;
+		params.weightx = weightx;
+		params.weighty = weighty;
+		params.anchor = GridBagConstraints.CENTER;
+		params.fill = GridBagConstraints.NONE;
+	}
+	
+	private void setConstraints(GridBagConstraints params, int x, int y, int height, 
+								int width, double weightx, double weighty, int anchor, int fill) {
+		params.gridx = x;
+		params.gridy = y;
+		params.gridheight = height;
+		params.gridwidth = width;
+		params.weightx = weightx;
+		params.weighty = weighty;
+		params.anchor = anchor;
+		params.fill = fill;
 	}
  
 	

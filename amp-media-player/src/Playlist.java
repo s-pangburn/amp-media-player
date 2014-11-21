@@ -36,6 +36,10 @@ public class Playlist {
 	private boolean shuffle;
 	private boolean repeat;
 	
+	public Playlist() {
+		init();
+	}
+	
 	public void init() {
 		playlist = new ArrayList<String>();
 		shuffleQueue = new ArrayList<String>();
@@ -95,7 +99,7 @@ public class Playlist {
 		playlist.clear();
 		
 		//TODO: Add confirmation message (in GUI?) saying that playlist is empty. (placeholders below)
-		System.out.println("Playlist: " + playlist);
+		System.out.println("Checking if Playlist was cleared - Playlist: " + playlist);
 		System.out.println("The playlist has been cleared! Loading playlist...");
 		
 		try {
@@ -164,7 +168,7 @@ public class Playlist {
 
 			transformer.transform(source, result);
 
-			System.out.println("File saved!");
+			System.out.println("The following file paths were saved - Playlist: " + playlist);
 
 		} 
 		
@@ -184,12 +188,77 @@ public class Playlist {
 		System.out.println("The media location '" + f + "' has been added to the Playlist.");
 	}
 	
+	public String getNextItem(String f) {
+		//TODO: Check that the item being searched is not the last in the playlist (check repeat true) 
+		if(playlist.contains(f)) {
+			//check that the file path is not the last item in the playlistt
+			if(playlist.indexOf(f) != playlist.size() - 1) {
+				System.out.println("The filepath '" + f + "' was found in the playlist.");
+				System.out.println("Returning the following: " + playlist.get(playlist.indexOf(f) + 1));
+				return playlist.get(playlist.indexOf(f) + 1);
+			}
+			
+			//if code reaches this far, this means that the item was the last item in the playlist
+			else {
+				System.out.println("The filepath '" + f + "' was the last item in the playlist.");
+				
+				//check if repeat is on
+				if(repeat == true) {
+					System.out.println("Because repeat is on, returning the following: " + playlist.get(0));
+					return playlist.get(0); //returns first item in the playlist
+				}
+
+				else {
+					System.out.println("Returning -1 because this was the last item in the playlist.");
+					return "-1";
+				}
+			}
+		}
+		
+		//if code reaches this far, this means that the file was not in the playlist
+		else {
+			System.out.println("The file path of the media (" + f + ") was not found in the playlist. Returning -1.");
+			return "-1";
+		}
+	}
+	
+	public String getPreviousItem(String f) {
+		//TODO: Check that the item being searched is not the last in the playlist (check repeat true) 
+		if(playlist.contains(f)) {
+			//check that the file path is not the last item in the playlistt
+			if(playlist.indexOf(f) != 0) {
+				System.out.println("The filepath '" + f + "' was found in the playlist.");
+				System.out.println("Returning the following: " + playlist.get(playlist.indexOf(f) - 1));
+				return playlist.get(playlist.indexOf(f) - 1);
+			}
+			
+			//if code reaches this far, this means that the item was the first item in the playlist
+			else {
+				System.out.println("The filepath '" + f + "' was the first item in the playlist.");
+				System.out.println("Returning -1 because this was the first item in the playlist.");
+				return "-1";
+			}
+
+		}
+		
+		//if code reaches this far, this means that the file was not in the playlist
+		else {
+			System.out.println("The file path of the media (" + f + ") was not found in the playlist. Returning -1.");
+			return "-1";
+		}
+	}
+	
+	
 	public void setRepeat(boolean r) {
 		repeat = r;
 	}
 	
 	public boolean getRepeat() {
 		return repeat;
+	}
+	
+	public ArrayList<String> getPlaylist() {
+		return playlist;
 	}
 
 	public static void main(String[] args) {
@@ -199,5 +268,7 @@ public class Playlist {
 		test.addMedia("user.media.mp3");
 		test.savePlaylist();
 		test.loadPlaylist("file.xml");
+		test.getNextItem("user.media.mp3"); //should return fourth.mp3
+		test.getPreviousItem("first.mp3"); //should return second.mp3
 	}
 }
