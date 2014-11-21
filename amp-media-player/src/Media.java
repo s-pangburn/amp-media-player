@@ -2,6 +2,7 @@
 import java.awt.Canvas;
 
 import javax.swing.JFrame;
+import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 
 import uk.co.caprica.vlcj.binding.LibVlc;
@@ -153,7 +154,7 @@ public class Media implements MediaPlayerEventListener {
         });
 	}
 	
-	public Media() {
+	public Media(JSlider slider) {
 		init();
 	}
 

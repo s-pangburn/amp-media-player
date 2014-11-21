@@ -2,23 +2,35 @@
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Paint;
-import java.awt.SystemColor;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.plaf.metal.MetalSliderUI;
 
 public class GUI extends JFrame {
 	
 	private Playlist playlist;
+	private Media media;
+	private JSlider slider;
 	
 	private class ToolBar extends JToolBar {
 		@Override
@@ -30,6 +42,7 @@ public class GUI extends JFrame {
 	public GUI() {
         playlist = new Playlist();
         init();
+        media = new Media(slider);
     }
 	
 	
@@ -103,7 +116,7 @@ public class GUI extends JFrame {
 		params.insets = new Insets(10, 10, 2, 10);
 		pane.add(display, params);
 		
-		JSlider slider = new JSlider(0, 1000, 0);
+		slider = new JSlider(0, 1000, 0);
 		setConstraints(params, 0, 3, 1, 5, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(2, 10, 10, 10);
 		initSlider(slider);
@@ -118,7 +131,7 @@ public class GUI extends JFrame {
 		params.insets = new Insets(5, 5, 5, 5);
 		pane.add(prevButton, params);
 		
-		JButton playButton = new JButton("Play");
+		final JButton playButton = new JButton("Play");
 		setConstraints(params, 2, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		pane.add(playButton, params);
 		
