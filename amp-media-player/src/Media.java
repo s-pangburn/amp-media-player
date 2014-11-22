@@ -35,15 +35,18 @@ public class Media implements MediaPlayerEventListener {
 		videoSurface = new Canvas();
 		playerFactory = new MediaPlayerFactory();
 		player = playerFactory.newEmbeddedMediaPlayer();
-		player.setVideoSurface(playerFactory.newVideoSurface(videoSurface));
 		looping = fastForwarding = false;
 		loopStart = loopEnd = 0;
 		timeScale = 1;
 		rewinding = false;
 	}
 	
-	public Canvas mediaPlayer() {
-		return videoSurface;
+	public void setCanvas(Canvas c) {
+		player.setVideoSurface(playerFactory.newVideoSurface(c));
+	}
+	
+	public EmbeddedMediaPlayer mediaPlayer() {
+		return player;
 	}
 	
 	public void playMedia(String file) {
@@ -141,7 +144,7 @@ public class Media implements MediaPlayerEventListener {
                 JFrame frame = new JFrame("test");
                 
                 
-                frame.add(media.mediaPlayer());
+                //frame.add(media.mediaPlayer());
                 
                 frame.setLocation(100,100);
                 frame.setSize(1050,600);

@@ -1,4 +1,5 @@
 
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -19,6 +20,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
@@ -28,7 +30,7 @@ import javax.swing.plaf.metal.MetalSliderUI;
 public class GUI extends JFrame {
 	
 	private Playlist playlist;
-	private Media media;
+	public Media media;
 	private JSlider slider;
 	
 	private class ToolBar extends JToolBar {
@@ -109,18 +111,13 @@ public class GUI extends JFrame {
 	private void drawControls(Container pane) {
 		GridBagConstraints params = new GridBagConstraints();
 		
-		/*JPanel display = new JPanel();
+		Canvas display = new Canvas();
 		display.setBackground(Color.black);
 		setConstraints(params, 0, 0, 3, 5, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 2, 10);
-		pane.add(display, params);*/
-		
-		//JFrame display = new JFrame();
-		//display.setBackground(Color.black);
-		//setConstraints(params, 0, 0, 3, 5, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
-		//params.insets = new Insets(10, 10, 2, 10);
-		pane.add(media.mediaPlayer());
-		//pane.add(display, params);
+//		display.add(media.mediaPlayer());
+		pane.add(display, params);
+		media.setCanvas(display);
 		
 		slider = new JSlider(0, 1000, 0);
 		setConstraints(params, 0, 3, 1, 5, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
@@ -179,7 +176,7 @@ public class GUI extends JFrame {
 		
 		
 		//Test code
-		media.playMedia("C:\\Users\\Chalenged\\Downloads\\Smash Bros. WiiU Music Preview.mp4");
+
 	}
 	
 	
@@ -298,6 +295,7 @@ public class GUI extends JFrame {
             public void run() {
                 GUI gui = new GUI();
                 gui.setVisible(true);
+                gui.media.playMedia("C:\\Users\\Chalenged\\Downloads\\Smash Bros. WiiU Music Preview.mp4");
             }
         });
     }
