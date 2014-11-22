@@ -19,7 +19,6 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
@@ -41,8 +40,8 @@ public class GUI extends JFrame {
 	
 	public GUI() {
         playlist = new Playlist();
+        media = new Media();
         init();
-        media = new Media(slider);
     }
 	
 	
@@ -110,11 +109,18 @@ public class GUI extends JFrame {
 	private void drawControls(Container pane) {
 		GridBagConstraints params = new GridBagConstraints();
 		
-		JPanel display = new JPanel();
+		/*JPanel display = new JPanel();
 		display.setBackground(Color.black);
 		setConstraints(params, 0, 0, 3, 5, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 2, 10);
-		pane.add(display, params);
+		pane.add(display, params);*/
+		
+		//JFrame display = new JFrame();
+		//display.setBackground(Color.black);
+		//setConstraints(params, 0, 0, 3, 5, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+		//params.insets = new Insets(10, 10, 2, 10);
+		pane.add(media.mediaPlayer());
+		//pane.add(display, params);
 		
 		slider = new JSlider(0, 1000, 0);
 		setConstraints(params, 0, 3, 1, 5, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
@@ -170,6 +176,10 @@ public class GUI extends JFrame {
 				System.out.println("Go to next media");
 			}
 		});
+		
+		
+		//Test code
+		media.playMedia("C:\\Users\\Chalenged\\Downloads\\Smash Bros. WiiU Music Preview.mp4");
 	}
 	
 	
@@ -232,6 +242,7 @@ public class GUI extends JFrame {
 		/*
 		 * Sets the slider to jump to a position on-click
 		 */
+		media.setSlider(slider);
 		slider.setUI(new MetalSliderUI() {
 			  protected TrackListener createTrackListener(JSlider slider) {
 				    return new TrackListener() {

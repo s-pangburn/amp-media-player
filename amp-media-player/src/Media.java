@@ -29,6 +29,7 @@ public class Media implements MediaPlayerEventListener {
 	private boolean looping, fastForwarding;
 	private long timeScale;	
 	private boolean rewinding;
+	private JSlider slider;
 	
 	public void init() {
 		videoSurface = new Canvas();
@@ -118,6 +119,10 @@ public class Media implements MediaPlayerEventListener {
 		return fileName;
 	}
 	
+	public void setSlider(JSlider s) {
+		slider = s;
+	}
+	
 	/*
 	public void update() {
 		
@@ -129,11 +134,6 @@ public class Media implements MediaPlayerEventListener {
 	
 	
 	public static void main(final String[] args) {
-
-        NativeLibrary.addSearchPath(
-            RuntimeUtil.getLibVlcLibraryName(), "C:\\Program Files (x86)\\VideoLAN\\VLC"
-        );
-        Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -154,7 +154,12 @@ public class Media implements MediaPlayerEventListener {
         });
 	}
 	
-	public Media(JSlider slider) {
+	public Media() {
+
+        NativeLibrary.addSearchPath(
+            RuntimeUtil.getLibVlcLibraryName(), "C:\\Program Files (x86)\\VideoLAN\\VLC"
+        );
+        Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 		init();
 	}
 
