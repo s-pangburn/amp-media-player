@@ -14,6 +14,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -37,7 +39,11 @@ public class GUI extends JFrame {
 	private Playlist playlist;
 	public Media media;
 	private JSlider slider;
-	final JButton playButton = new JButton("Play");
+	Icon play = new ImageIcon("play.png");
+	Icon pause = new ImageIcon("pause.png");
+	Icon next = new ImageIcon("next.png");
+	Icon prev = new ImageIcon("prev.png");
+	final JButton playButton = new JButton(play);
 	
 	private class ToolBar extends JToolBar {
 		@Override
@@ -57,8 +63,8 @@ public class GUI extends JFrame {
 		Container pane = getContentPane();
 		pane.setLayout(new GridBagLayout());
 
-		drawMenu(pane);
 		drawControls(pane);
+		drawMenu(pane);
 		drawPlaylist(pane);
 		
 		pack();
@@ -118,7 +124,7 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				openFile();
-				playButton.setText("Pause");
+				playButton.setIcon(pause);
 			}
 		});
 	}
@@ -145,16 +151,17 @@ public class GUI extends JFrame {
 		setConstraints(params, 0, 4, 1, 1, 1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
-		JButton prevButton = new JButton("Prev");
+		JButton prevButton = new JButton(prev);
 		setConstraints(params, 1, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(5, 5, 5, 5);
 		pane.add(prevButton, params);
 		
 		//Playbutton
+		playButton.setIcon(play);
 		setConstraints(params, 2, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		pane.add(playButton, params);
 		
-		JButton skipButton = new JButton("Next");
+		JButton skipButton = new JButton(next);
 		setConstraints(params, 3, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		pane.add(skipButton, params);
 		
@@ -173,11 +180,11 @@ public class GUI extends JFrame {
 		playButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				if (playButton.getText() == "Play") {
-					playButton.setText("Pause");
+				if (playButton.getIcon() == play) {
+					playButton.setIcon(pause);
 					media.play();
 				} else {
-					playButton.setText("Play");
+					playButton.setIcon(play);
 					media.pause();
 				}
 			}
