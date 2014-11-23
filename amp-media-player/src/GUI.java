@@ -25,6 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
@@ -88,6 +89,7 @@ public class GUI extends JFrame {
 	}
 	
 	private void drawMenu(Container pane) {
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		JMenuBar menu = new JMenuBar();
 		//ImageIcon icon = new ImageIcon("XXXX.png");
 		
