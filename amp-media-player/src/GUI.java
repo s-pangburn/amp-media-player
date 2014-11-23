@@ -10,10 +10,12 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -25,6 +27,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.Timer;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.metal.MetalSliderUI;
 
 public class GUI extends JFrame {
@@ -32,6 +37,7 @@ public class GUI extends JFrame {
 	private Playlist playlist;
 	public Media media;
 	private JSlider slider;
+	final JButton playButton = new JButton("Play");
 	
 	private class ToolBar extends JToolBar {
 		@Override
@@ -61,6 +67,15 @@ public class GUI extends JFrame {
 		setMinimumSize(new Dimension(650, 420));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		Timer timer = new Timer(1, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				slider.setValue(media.getTimestamp());
+			}
+		});
+		timer.setInitialDelay(1);
+		timer.start(); 
 	}
 	
 	private void drawMenu(Container pane) {
@@ -69,8 +84,8 @@ public class GUI extends JFrame {
 		
 		JMenu file = new JMenu("File");
 		
-		JMenuItem exit = new JMenuItem("Exit");
-		exit.setToolTipText("Exits the application");
+		JMenuItem open = new JMenuItem("Open");
+		open.setToolTipText("Open a file");
 		
 		JMenu edit = new JMenu("Edit");
 		
@@ -87,7 +102,7 @@ public class GUI extends JFrame {
 		JMenuItem nothing3 = new JMenuItem("Nope");
 		nothing3.setToolTipText("This definitely won't do anything");
 		
-		file.add(exit);
+		file.add(open);
 		edit.add(nothing);
 		view.add(nothing2);
 		filter.add(nothing3);
@@ -99,10 +114,11 @@ public class GUI extends JFrame {
 		
 		setJMenuBar(menu);
 
-		exit.addActionListener(new ActionListener() {
+		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				System.exit(0);
+				openFile();
+				playButton.setText("Pause");
 			}
 		});
 	}
@@ -134,7 +150,7 @@ public class GUI extends JFrame {
 		params.insets = new Insets(5, 5, 5, 5);
 		pane.add(prevButton, params);
 		
-		final JButton playButton = new JButton("Play");
+		//Playbutton
 		setConstraints(params, 2, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		pane.add(playButton, params);
 		
@@ -159,10 +175,10 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent event) {
 				if (playButton.getText() == "Play") {
 					playButton.setText("Pause");
-					System.out.println("Play media");
+					media.play();
 				} else {
 					playButton.setText("Play");
-					System.out.println("Pause media");
+					media.pause();
 				}
 			}
 		});
@@ -243,18 +259,26 @@ public class GUI extends JFrame {
 		slider.setUI(new MetalSliderUI() {
 			  protected TrackListener createTrackListener(JSlider slider) {
 				    return new TrackListener() {
+				    	public int value;
 				      @Override public void mousePressed(MouseEvent e) {
 				        JSlider slider = (JSlider)e.getSource();
 				        switch (slider.getOrientation()) {
 				          case JSlider.VERTICAL:
 				            slider.setValue(valueForYPosition(e.getY()));
+				            value = slider.getValue();
 				            break;
 				          case JSlider.HORIZONTAL:
 				            slider.setValue(valueForXPosition(e.getX()));
+				            value = slider.getValue();
 				            break;
 				        }
 				        super.mousePressed(e); //isDragging = true;
 				        super.mouseDragged(e);
+				      }
+				      @Override public void mouseReleased(MouseEvent e) {
+					      JSlider slider = (JSlider)e.getSource();
+				    	  media.setTimestamp(value);
+				    	  super.mouseReleased(e);
 				      }
 				      /*@Override public boolean shouldScroll(int direction) {
 				        return false;
@@ -288,6 +312,19 @@ public class GUI extends JFrame {
 		params.anchor = anchor;
 		params.fill = fill;
 	}
+	
+	private void openFile() {
+		JFileChooser fileopen = new JFileChooser();
+        FileFilter filter = new FileNameExtensionFilter("mp4 files", "mp4");
+        fileopen.addChoosableFileFilter(filter);
+
+        int ret = fileopen.showDialog(new JPanel(), "Open file");
+
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            String file = fileopen.getSelectedFile().toString();
+            media.playMedia(file);
+        }
+	}
  
 	
     public static void main(String[] args) {
@@ -295,7 +332,6 @@ public class GUI extends JFrame {
             public void run() {
                 GUI gui = new GUI();
                 gui.setVisible(true);
-                gui.media.playMedia("C:\\Users\\Chalenged\\Downloads\\Smash Bros. WiiU Music Preview.mp4");
             }
         });
     }

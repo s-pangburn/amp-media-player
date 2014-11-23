@@ -19,7 +19,7 @@ import com.sun.jna.NativeLibrary;
 
 
 public class Media implements MediaPlayerEventListener {
-	public static final int TIMESTAMPMAX = 1000;
+	public static final double TIMESTAMPMAX = 1000.0;
 	
 	private String fileName;
 	private MediaPlayerFactory playerFactory; 
@@ -87,7 +87,7 @@ public class Media implements MediaPlayerEventListener {
 	}
 	
 	public void setTimestamp(int pos) {
-		player.setPosition((float)pos / TIMESTAMPMAX);
+		player.setPosition((float)(pos / TIMESTAMPMAX));
 	}
 	
 	public void setTimeScale(long t) {
