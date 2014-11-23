@@ -43,6 +43,9 @@ public class GUI extends JFrame {
 	Icon pause = new ImageIcon("pause.png");
 	Icon next = new ImageIcon("next.png");
 	Icon prev = new ImageIcon("prev.png");
+	Icon shuffle = new ImageIcon("shuffle.png");
+	Icon repeat = new ImageIcon("repeat.png");
+	Icon savelist = new ImageIcon("save.png");
 	final JButton playButton = new JButton(play);
 	
 	private class ToolBar extends JToolBar {
@@ -215,7 +218,8 @@ public class GUI extends JFrame {
 		setConstraints(params, 6, 0, 1, 1, 0.1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
-		JButton save = new JButton("Save");
+		JButton save = new JButton(savelist);
+		save.setToolTipText("Save Playlist");
 		setConstraints(params, 7, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 0, 11);
 		pane.add(save, params);
@@ -223,9 +227,11 @@ public class GUI extends JFrame {
 		ToolBar toolbar = new ToolBar();
 		setConstraints(params, 5, 1, 1, 3, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 9, 0, 10);
-		JToggleButton shuffleButton = new JToggleButton("S");
+		JToggleButton shuffleButton = new JToggleButton(shuffle);
+		shuffleButton.setToolTipText("Shuffle");
 		toolbar.add(shuffleButton);
-		JToggleButton repeatButton = new JToggleButton("R");
+		JToggleButton repeatButton = new JToggleButton(repeat);
+		repeatButton.setToolTipText("Repeat");
 		toolbar.add(repeatButton);
 		toolbar.add(Box.createHorizontalGlue());
 		JButton newPlaylistButton = new JButton("New");
@@ -281,6 +287,11 @@ public class GUI extends JFrame {
 				        }
 				        super.mousePressed(e); //isDragging = true;
 				        super.mouseDragged(e);
+				      }
+				      @Override public void mouseDragged(MouseEvent e) {
+					      super.mouseDragged(e);
+					      JSlider slider = (JSlider)e.getSource();
+					      value = slider.getValue();
 				      }
 				      @Override public void mouseReleased(MouseEvent e) {
 					      JSlider slider = (JSlider)e.getSource();
