@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 public class Playlist {
 	private ArrayList<String> playlist;
+	private ArrayList<fileProperty> playlist2;
 	private ArrayList<String> shuffleQueue; //ArrayList that is made for shuffling method
 	
 	private HashMap<String,String> itemInfo; //will return name of media and length
@@ -42,6 +43,7 @@ public class Playlist {
 	
 	public void init() {
 		playlist = new ArrayList<String>();
+		playlist2 = new ArrayList<fileProperty>();
 		shuffleQueue = new ArrayList<String>();
 		itemInfo = new HashMap<String,String>();
 		currentItemIndex = 0;
@@ -52,6 +54,11 @@ public class Playlist {
 		playlist.add("second.mp3");
 		playlist.add("third.mp3");
 		playlist.add("fourth.mp3");
+		
+		playlist2.add(new fileProperty("First Song", "first.mp3", "3:33"));
+		playlist2.add(new fileProperty("Second Song", "second.mp3", "4:44"));
+		playlist2.add(new fileProperty("Third Song", "third.mp3", "5:55"));
+		playlist2.add(new fileProperty("Fourth Song", "fourth.mp3", "6:06"));
 	}
 	
 	/* INITIAL CODE USING DOM PARSER (DIDN'T WORK, SAVING IN CASE NEEDED)
@@ -119,6 +126,7 @@ public class Playlist {
 				//If it finds <Media>text here</Media>, it will add it to the playlist Arraylist.
 				if (m.matches()) {
 					playlist.add(m.group(2));
+					//playlist.add2(new fileProperty(getTitle(m.group(2)), m.group(2), getTime(m.group(2)));
 				}
 			}
 
