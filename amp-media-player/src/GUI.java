@@ -270,7 +270,6 @@ public class GUI extends JFrame {
 		/*
 		 * Sets the slider to jump to a position on-click
 		 */
-		media.setSlider(slider);
 		slider.setUI(new MetalSliderUI() {
 			  protected TrackListener createTrackListener(JSlider slider) {
 				    return new TrackListener() {
@@ -337,6 +336,7 @@ public class GUI extends JFrame {
 		JFileChooser fileopen = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter("mp4 files", "mp4");
         fileopen.addChoosableFileFilter(filter);
+        fileopen.setFileFilter(filter);
 
         int ret = fileopen.showDialog(new JPanel(), "Open file");
 
