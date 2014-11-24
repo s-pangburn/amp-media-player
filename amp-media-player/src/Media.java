@@ -2,23 +2,22 @@
 import java.awt.Canvas;
 
 import javax.swing.JFrame;
-import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 
 import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.player.MediaPlayer;
+import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
-import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
 
 
-public class Media implements MediaPlayerEventListener {
+public class Media extends MediaPlayerEventAdapter {
 	public static final double TIMESTAMPMAX = 1000.0;
 	
 	private String fileName;
@@ -38,6 +37,7 @@ public class Media implements MediaPlayerEventListener {
 		loopStart = loopEnd = 0;
 		timeScale = 1;
 		rewinding = false;
+		player.addMediaPlayerEventListener(this);
 	}
 	
 	public void setCanvas(Canvas c) {
@@ -122,7 +122,14 @@ public class Media implements MediaPlayerEventListener {
 	}
 	
 	public void update() {
-		
+		if (looping) {
+			if (getTimestamp() > loopEnd) {
+				setTimestamp(loopStart);
+			}
+			else if (getTimestamp() < loopStart) {
+				setTimestamp(loopStart);
+			}
+		}
 	}
 	
 	public long getLength() {
@@ -137,7 +144,11 @@ public class Media implements MediaPlayerEventListener {
                 Media media = new Media();
                 JFrame frame = new JFrame("test");
                 
+                Canvas canvas = new Canvas();
+                canvas.setVisible(true);
+                media.setCanvas(canvas);
                 
+                frame.add(canvas);
                 //frame.add(media.mediaPlayer());
                 
                 frame.setLocation(100,100);
@@ -146,7 +157,13 @@ public class Media implements MediaPlayerEventListener {
                 frame.setVisible(true);		
                 
                 media.playMedia("C:\\Users\\Chalenged\\Downloads\\Smash Bros. WiiU Music Preview.mp4");
-                
+//                
+                try {
+                	Thread.sleep(5000);
+                } catch(InterruptedException ex) {} 
+                System.out.println(media.getLength());
+//                media.setLoop(490, 510);
+//                media.setTimestamp(800);
             }
         });
 	}
@@ -187,7 +204,9 @@ public class Media implements MediaPlayerEventListener {
 	@Override
 	public void finished(MediaPlayer arg0) {
 		// TODO Auto-generated method stub
-		
+		player.playMedia(fileName);
+		//player.setPosition(temp);
+//		player.pause();
 	}
 
 	@Override
@@ -253,6 +272,7 @@ public class Media implements MediaPlayerEventListener {
 	@Override
 	public void opening(MediaPlayer arg0) {
 		// TODO Auto-generated method stub
+		//player.pause();
 		
 	}
 
@@ -277,7 +297,7 @@ public class Media implements MediaPlayerEventListener {
 	@Override
 	public void positionChanged(MediaPlayer arg0, float arg1) {
 		// TODO Auto-generated method stub
-		
+		update();
 	}
 
 	@Override
