@@ -1,24 +1,53 @@
 
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Paint;
-import java.awt.SystemColor;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.Timer;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.metal.MetalSliderUI;
 
 public class GUI extends JFrame {
 	
 	private Playlist playlist;
+	public Media media;
+	private JSlider slider;
+	Icon play = new ImageIcon("play.png");
+	Icon pause = new ImageIcon("pause.png");
+	Icon next = new ImageIcon("next.png");
+	Icon prev = new ImageIcon("prev.png");
+	Icon shuffle = new ImageIcon("shuffle.png");
+	Icon repeat = new ImageIcon("repeat.png");
+	Icon savelist = new ImageIcon("save.png");
+	final JButton playButton = new JButton(play);
 	
 	private class ToolBar extends JToolBar {
 		@Override
@@ -29,6 +58,7 @@ public class GUI extends JFrame {
 	
 	public GUI() {
         playlist = new Playlist();
+        media = new Media();
         init();
     }
 	
@@ -37,8 +67,8 @@ public class GUI extends JFrame {
 		Container pane = getContentPane();
 		pane.setLayout(new GridBagLayout());
 
-		drawMenu(pane);
 		drawControls(pane);
+		drawMenu(pane);
 		drawPlaylist(pane);
 		
 		pack();
@@ -47,16 +77,26 @@ public class GUI extends JFrame {
 		setMinimumSize(new Dimension(650, 420));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		Timer timer = new Timer(1, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				slider.setValue(media.getTimestamp());
+			}
+		});
+		timer.setInitialDelay(1);
+		timer.start(); 
 	}
 	
 	private void drawMenu(Container pane) {
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		JMenuBar menu = new JMenuBar();
 		//ImageIcon icon = new ImageIcon("XXXX.png");
 		
 		JMenu file = new JMenu("File");
 		
-		JMenuItem exit = new JMenuItem("Exit");
-		exit.setToolTipText("Exits the application");
+		JMenuItem open = new JMenuItem("Open");
+		open.setToolTipText("Open a file");
 		
 		JMenu edit = new JMenu("Edit");
 		
@@ -73,7 +113,7 @@ public class GUI extends JFrame {
 		JMenuItem nothing3 = new JMenuItem("Nope");
 		nothing3.setToolTipText("This definitely won't do anything");
 		
-		file.add(exit);
+		file.add(open);
 		edit.add(nothing);
 		view.add(nothing2);
 		filter.add(nothing3);
@@ -85,10 +125,11 @@ public class GUI extends JFrame {
 		
 		setJMenuBar(menu);
 
-		exit.addActionListener(new ActionListener() {
+		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				System.exit(0);
+				openFile();
+				playButton.setIcon(pause);
 			}
 		});
 	}
@@ -97,13 +138,15 @@ public class GUI extends JFrame {
 	private void drawControls(Container pane) {
 		GridBagConstraints params = new GridBagConstraints();
 		
-		JPanel display = new JPanel();
+		Canvas display = new Canvas();
 		display.setBackground(Color.black);
 		setConstraints(params, 0, 0, 3, 5, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 2, 10);
+//		display.add(media.mediaPlayer());
 		pane.add(display, params);
+		media.setCanvas(display);
 		
-		JSlider slider = new JSlider(0, 1000, 0);
+		slider = new JSlider(0, 1000, 0);
 		setConstraints(params, 0, 3, 1, 5, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(2, 10, 10, 10);
 		initSlider(slider);
@@ -113,16 +156,17 @@ public class GUI extends JFrame {
 		setConstraints(params, 0, 4, 1, 1, 1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
-		JButton prevButton = new JButton("Prev");
+		JButton prevButton = new JButton(prev);
 		setConstraints(params, 1, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(5, 5, 5, 5);
 		pane.add(prevButton, params);
 		
-		JButton playButton = new JButton("Play");
+		//Playbutton
+		playButton.setIcon(play);
 		setConstraints(params, 2, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		pane.add(playButton, params);
 		
-		JButton skipButton = new JButton("Next");
+		JButton skipButton = new JButton(next);
 		setConstraints(params, 3, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
 		pane.add(skipButton, params);
 		
@@ -141,12 +185,12 @@ public class GUI extends JFrame {
 		playButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				if (playButton.getText() == "Play") {
-					playButton.setText("Pause");
-					System.out.println("Play media");
+				if (playButton.getIcon() == play) {
+					playButton.setIcon(pause);
+					media.play();
 				} else {
-					playButton.setText("Play");
-					System.out.println("Pause media");
+					playButton.setIcon(play);
+					media.pause();
 				}
 			}
 		});
@@ -157,6 +201,10 @@ public class GUI extends JFrame {
 				System.out.println("Go to next media");
 			}
 		});
+		
+		
+		//Test code
+
 	}
 	
 	
@@ -172,7 +220,8 @@ public class GUI extends JFrame {
 		setConstraints(params, 6, 0, 1, 1, 0.1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
-		JButton save = new JButton("Save");
+		JButton save = new JButton(savelist);
+		save.setToolTipText("Save Playlist");
 		setConstraints(params, 7, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 0, 11);
 		pane.add(save, params);
@@ -180,9 +229,11 @@ public class GUI extends JFrame {
 		ToolBar toolbar = new ToolBar();
 		setConstraints(params, 5, 1, 1, 3, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 9, 0, 10);
-		JToggleButton shuffleButton = new JToggleButton("S");
+		JToggleButton shuffleButton = new JToggleButton(shuffle);
+		shuffleButton.setToolTipText("Shuffle");
 		toolbar.add(shuffleButton);
-		JToggleButton repeatButton = new JToggleButton("R");
+		JToggleButton repeatButton = new JToggleButton(repeat);
+		repeatButton.setToolTipText("Repeat");
 		toolbar.add(repeatButton);
 		toolbar.add(Box.createHorizontalGlue());
 		JButton newPlaylistButton = new JButton("New");
@@ -219,21 +270,35 @@ public class GUI extends JFrame {
 		/*
 		 * Sets the slider to jump to a position on-click
 		 */
+		media.setSlider(slider);
 		slider.setUI(new MetalSliderUI() {
 			  protected TrackListener createTrackListener(JSlider slider) {
 				    return new TrackListener() {
+				    	public int value;
 				      @Override public void mousePressed(MouseEvent e) {
 				        JSlider slider = (JSlider)e.getSource();
 				        switch (slider.getOrientation()) {
 				          case JSlider.VERTICAL:
 				            slider.setValue(valueForYPosition(e.getY()));
+				            value = slider.getValue();
 				            break;
 				          case JSlider.HORIZONTAL:
 				            slider.setValue(valueForXPosition(e.getX()));
+				            value = slider.getValue();
 				            break;
 				        }
 				        super.mousePressed(e); //isDragging = true;
 				        super.mouseDragged(e);
+				      }
+				      @Override public void mouseDragged(MouseEvent e) {
+					      super.mouseDragged(e);
+					      JSlider slider = (JSlider)e.getSource();
+					      value = slider.getValue();
+				      }
+				      @Override public void mouseReleased(MouseEvent e) {
+					      JSlider slider = (JSlider)e.getSource();
+				    	  media.setTimestamp(value);
+				    	  super.mouseReleased(e);
 				      }
 				      /*@Override public boolean shouldScroll(int direction) {
 				        return false;
@@ -266,6 +331,19 @@ public class GUI extends JFrame {
 		params.weighty = weighty;
 		params.anchor = anchor;
 		params.fill = fill;
+	}
+	
+	private void openFile() {
+		JFileChooser fileopen = new JFileChooser();
+        FileFilter filter = new FileNameExtensionFilter("mp4 files", "mp4");
+        fileopen.addChoosableFileFilter(filter);
+
+        int ret = fileopen.showDialog(new JPanel(), "Open file");
+
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            String file = fileopen.getSelectedFile().toString();
+            media.playMedia(file);
+        }
 	}
  
 	
