@@ -270,7 +270,6 @@ public class GUI extends JFrame {
 		/*
 		 * Sets the slider to jump to a position on-click
 		 */
-		media.setSlider(slider);
 		slider.setUI(new MetalSliderUI() {
 			  protected TrackListener createTrackListener(JSlider slider) {
 				    return new TrackListener() {
