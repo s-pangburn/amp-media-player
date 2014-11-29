@@ -2,24 +2,27 @@
 public class fileProperty {
 	private String title;
 	private String filePath;
-	private String time;
+	private String length;
 	
-	fileProperty(String t, String fp, String tm) {
+	findData finder;
+	
+	fileProperty(String t, String fp, String l) {
 		title = t;
 		filePath = fp;
-		time = tm;
+		length = l;
 	}
 	
-	public void setTitle(String t) {
-		title = t;
+	//S
+	public void setTitle(String file) {
+		title = finder.getTitle(file);
 	}
 	
-	public void setFilePath(String fp) {
-		filePath = fp;
+	public void setFilePath(String file) {
+		filePath = file;
 	}
 	
-	public void setTime(String tm) {
-		time = tm;
+	public void setLength(String file) {
+		length = finder.getLength(file);
 	}
 	
 	public String getTitle() {
@@ -30,12 +33,16 @@ public class fileProperty {
 		return filePath;
 	}
 	
-	public String getTime() {
-		return time;
+	public String getLength() {
+		return length;
 	}
 	
 	//toString included for debugging purposes
 	public String toString() {
-		return "<" + title + ", " + filePath + " - " + time + ">";
+		return "<" + title + ", " + filePath + ", " + length + ">";
+	}
+	
+	public static void main(String[] args) {
+		
 	}
 }

@@ -24,18 +24,15 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-
 public class Playlist {
 	private ArrayList<String> playlist;
 	private ArrayList<fileProperty> playlist2;
 	private ArrayList<String> shuffleQueue; //ArrayList that is made for shuffling method
 	
-	private HashMap<String,String> itemInfo; //will return name of media and length
-	private int currentItemIndex;
-	
 	private boolean shuffle;
 	private boolean repeat;
+	
+	findData finder;
 	
 	public Playlist() {
 		init();
@@ -45,20 +42,15 @@ public class Playlist {
 		playlist = new ArrayList<String>();
 		playlist2 = new ArrayList<fileProperty>();
 		shuffleQueue = new ArrayList<String>();
-		itemInfo = new HashMap<String,String>();
-		currentItemIndex = 0;
 		shuffle = false;
 		repeat = false;
-	
-		playlist.add("first.mp3");
-		playlist.add("second.mp3");
-		playlist.add("third.mp3");
-		playlist.add("fourth.mp3");
 		
-		playlist2.add(new fileProperty("First Song", "first.mp3", "3:33"));
-		playlist2.add(new fileProperty("Second Song", "second.mp3", "4:44"));
-		playlist2.add(new fileProperty("Third Song", "third.mp3", "5:55"));
-		playlist2.add(new fileProperty("Fourth Song", "fourth.mp3", "6:06"));
+		finder = new findData();
+	
+		playlist.add("C:\\Users\\New Ending\\Music\\Icon For Hire - Icon For Hire (Self-Titled)\\01. Cynics & Critics.mp3");
+		playlist.add("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
+		playlist.add("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
+		playlist.add("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 	}
 	
 	/* INITIAL CODE USING DOM PARSER (DIDN'T WORK, SAVING IN CASE NEEDED)
@@ -111,8 +103,8 @@ public class Playlist {
 		clearPlaylist();
 		
 		//TODO: Add confirmation message (in GUI?) saying that playlist is empty. (placeholders below)
-		System.out.println("Checking if Playlist was cleared - Playlist: " + playlist);
-		System.out.println("The playlist has been cleared! Loading playlist...");
+		System.out.println("loadPlaylist: Checking if Playlist was cleared... ArrayList Playlist = " + playlist);
+		System.out.println("loadPlaylist: The playlist has been cleared! Loading playlist...");
 		
 		try {
 			//Opening file
@@ -131,18 +123,34 @@ public class Playlist {
 				//If it finds <Media>text here</Media>, it will add it to the playlist Arraylist.
 				if (m.matches()) {
 					playlist.add(m.group(2));
-					//playlist.add2(new fileProperty(getTitle(m.group(2)), m.group(2), getTime(m.group(2)));
 				}
 			}
 
 		} catch (NullPointerException e) {
-			System.out.println("Error!");
+			System.out.println("loadPlaylist: Error!");
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found!");
+			System.out.println("loadPlaylist: File not found!");
 		}
 
-		System.out.println(playlist);
+		System.out.println("loadPlaylist: ArrayList Playlist = " + playlist + "\n");
 	}
+	
+	public void loadInfo() {
+		String format = "";
+		
+		if(playlist != null) {
+			for(int i = 0; i < playlist.size(); i++) {
+				//taking care of "&" escape character from xml parsing
+				format = playlist.get(i);
+				format = format.replace("&amp;", "&");
+				
+				playlist2.add(new fileProperty(finder.getTitle(format), format, finder.getLength(format)));
+			}
+
+			System.out.println("loadInfo: ArrayList Playlist2 = " + playlist2 + "\n");
+		}
+	}
+	
     
 	public void savePlaylist() {
 		try {
@@ -181,7 +189,7 @@ public class Playlist {
 
 			transformer.transform(source, result);
 
-			System.out.println("The following file paths were saved - Playlist: " + playlist);
+			System.out.println("savePlaylist: The following file paths were saved - ArrayList Playlist = " + playlist + "\n");
 
 		} 
 		
@@ -198,7 +206,7 @@ public class Playlist {
 	public void addMedia(String f) {
 		//Adds the fileName string into the Arraylist
 		playlist.add(f);
-		System.out.println("The media location '" + f + "' has been added to the Playlist.");
+		System.out.println("addMedia: The media location '" + f + "' has been added to the Playlist. \n");
 	}
 	
 	public String getNextItem(String f) {
@@ -206,23 +214,23 @@ public class Playlist {
 		if(playlist.contains(f)) {
 			//check that the file path is not the last item in the playlistt
 			if(playlist.indexOf(f) != playlist.size() - 1) {
-				System.out.println("The filepath '" + f + "' was found in the playlist.");
-				System.out.println("Returning the following: " + playlist.get(playlist.indexOf(f) + 1));
+				System.out.println("getNextItem: The filepath '" + f + "' was found in the playlist.");
+				System.out.println("getNextItem: Returning the following: " + playlist.get(playlist.indexOf(f) + 1) + "\n");
 				return playlist.get(playlist.indexOf(f) + 1);
 			}
 			
 			//if code reaches this far, this means that the item was the last item in the playlist
 			else {
-				System.out.println("The filepath '" + f + "' was the last item in the playlist.");
+				System.out.println("getNextItem: The filepath '" + f + "' was the last item in the playlist.");
 				
 				//check if repeat is on
 				if(repeat == true) {
-					System.out.println("Because repeat is on, returning the following: " + playlist.get(0));
+					System.out.println("getNextItem: Because repeat is on, returning the following: " + playlist.get(0) + "\n");
 					return playlist.get(0); //returns first item in the playlist
 				}
 
 				else {
-					System.out.println("Returning -1 because this was the last item in the playlist.");
+					System.out.println("getNextItem: Returning -1 because this was the last item in the playlist. \n");
 					return "-1";
 				}
 			}
@@ -230,7 +238,7 @@ public class Playlist {
 		
 		//if code reaches this far, this means that the file was not in the playlist
 		else {
-			System.out.println("The file path of the media (" + f + ") was not found in the playlist. Returning -1.");
+			System.out.println("getNextItem: The file path of the media (" + f + ") was not found in the playlist. Returning -1.");
 			return "-1";
 		}
 	}
@@ -240,15 +248,15 @@ public class Playlist {
 		if(playlist.contains(f)) {
 			//check that the file path is not the last item in the playlistt
 			if(playlist.indexOf(f) != 0) {
-				System.out.println("The filepath '" + f + "' was found in the playlist.");
-				System.out.println("Returning the following: " + playlist.get(playlist.indexOf(f) - 1));
+				System.out.println("getPreviousItem: The filepath '" + f + "' was found in the playlist.");
+				System.out.println("getPreviousItem: Returning the following: " + playlist.get(playlist.indexOf(f) - 1));
 				return playlist.get(playlist.indexOf(f) - 1);
 			}
 			
 			//if code reaches this far, this means that the item was the first item in the playlist
 			else {
-				System.out.println("The filepath '" + f + "' was the first item in the playlist.");
-				System.out.println("Returning -1 because this was the first item in the playlist.");
+				System.out.println("getPreviousItem: The filepath '" + f + "' was the first item in the playlist.");
+				System.out.println("getPreviousItem: Returning -1 because this was the first item in the playlist.");
 				return "-1";
 			}
 
@@ -256,7 +264,7 @@ public class Playlist {
 		
 		//if code reaches this far, this means that the file was not in the playlist
 		else {
-			System.out.println("The file path of the media (" + f + ") was not found in the playlist. Returning -1.");
+			System.out.println("getPreviousItem: The file path of the media (" + f + ") was not found in the playlist. Returning -1.");
 			return "-1";
 		}
 	}
@@ -270,18 +278,25 @@ public class Playlist {
 		return repeat;
 	}
 	
+	
+	//TODO: (ToNOTDo really) Don't use this anymore, this playlist still has xml formatting (and just the file paths anyway)
 	public ArrayList<String> getPlaylist() {
 		return playlist;
+	}
+	
+	public ArrayList<fileProperty> getPlaylist2() {
+		return playlist2;
 	}
 
 	public static void main(String[] args) {
 
 		Playlist test = new Playlist();
 		test.init();
-		test.addMedia("user.media.mp3");
+		//test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 		test.savePlaylist();
 		test.loadPlaylist("file.xml");
-		test.getNextItem("user.media.mp3"); //should return fourth.mp3
-		test.getPreviousItem("first.mp3"); //should return second.mp3
+		test.loadInfo();
+		//test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a"); //should return fourth.mp3
+		//test.getPreviousItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a"); //should return second.mp3
 	}
 }
