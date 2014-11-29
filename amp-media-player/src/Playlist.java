@@ -50,7 +50,6 @@ public class Playlist {
 		playlist.add("C:\\Users\\New Ending\\Music\\Icon For Hire - Icon For Hire (Self-Titled)\\01. Cynics & Critics.mp3");
 		playlist.add("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
 		playlist.add("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
-		playlist.add("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 	}
 	
 	/* INITIAL CODE USING DOM PARSER (DIDN'T WORK, SAVING IN CASE NEEDED)
@@ -128,6 +127,7 @@ public class Playlist {
 		}
 
 		System.out.println("loadPlaylist: ArrayList Playlist = " + playlist + "\n");
+		loadInfo();
 	}
 	
 	public void loadInfo() {
@@ -201,7 +201,13 @@ public class Playlist {
 	public void addMedia(String f) {
 		//Adds the fileName string into the Arraylist
 		playlist.add(f);
-		System.out.println("addMedia: The media location '" + f + "' has been added to the Playlist. \n");
+		System.out.println("addMedia: The media location '" + f + "' has been added to the Playlist.");
+		String format = f;
+		format = format.replace("&amp;", "&");
+		
+		playlist2.add(new fileProperty(finder.getTitle(format), format, finder.getLength(format)));
+		
+		System.out.println("addMedia: New ArrayList Playlist2 = " + playlist2 + "\n"); //for debugging purposes
 	}
 	
 	public String getNextItem(String f) {
@@ -287,10 +293,9 @@ public class Playlist {
 
 		Playlist test = new Playlist();
 		test.init();
-		//test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 		test.savePlaylist();
 		test.loadPlaylist("file.xml");
-		test.loadInfo();
+		test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 		//test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a"); //should return fourth.mp3
 		//test.getPreviousItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a"); //should return second.mp3
 	}
