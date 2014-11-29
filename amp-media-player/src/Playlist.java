@@ -100,10 +100,15 @@ public class Playlist {
 
 	}*/
 	
+	
+	public void clearPlaylist() {
+		playlist.clear();
+	}
+	
 
 	public void loadPlaylist(String f) {
 		//Clear Playlist
-		playlist.clear();
+		clearPlaylist();
 		
 		//TODO: Add confirmation message (in GUI?) saying that playlist is empty. (placeholders below)
 		System.out.println("Checking if Playlist was cleared - Playlist: " + playlist);
