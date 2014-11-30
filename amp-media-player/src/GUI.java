@@ -7,15 +7,18 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.Box;
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -44,6 +47,10 @@ public class GUI extends JFrame {
 	private Playlist playlist;
 	public Media media;
 	private JSlider slider;
+	final Container pane = getContentPane();
+	JList<String> plist;
+	DefaultListModel list = new DefaultListModel();
+	File lastDirectory = null;
 	Icon play = new ImageIcon("play.png");
 	Icon pause = new ImageIcon("pause.png");
 	Icon next = new ImageIcon("next.png");
@@ -51,14 +58,14 @@ public class GUI extends JFrame {
 	Icon shuffle = new ImageIcon("shuffle.png");
 	Icon repeat = new ImageIcon("repeat.png");
 	Icon savelist = new ImageIcon("save.png");
-	final Container pane = getContentPane();
-	JList<String> plist;
 	final JButton playButton = new JButton(play);
+	final JLabel listTitle = new JLabel("New Playlist");
 	
 	/*
-	 * TODO: File formats
+	 * TODO: Supported File formats??
 	 * TODO: Implement Delete
 	 * TODO: Implement rearrange
+	 * TODO: Shuffle
 	 * TODO: FullScreen
 	 * TODO: Looping
 	 */
@@ -72,6 +79,8 @@ public class GUI extends JFrame {
 	
 	public GUI() {
         playlist = new Playlist();
+//      playlist.addMedia("C:\\Users\\Stephen\\Videos\\ArmchairTheatre-TheCriminals.mp4");
+//		playlist.addMedia("C:\\Users\\Stephen\\Videos\\The Sign of Three.mp4");
         media = new Media();
         init();
     }
@@ -108,30 +117,43 @@ public class GUI extends JFrame {
 		
 		JMenu file = new JMenu("File");
 		
-		JMenuItem open = new JMenuItem("Open");
+		JMenuItem open = new JMenuItem("Open Media");
 		open.setToolTipText("Open a file");
+		JMenuItem newPList = new JMenuItem("New Playlist");
+		newPList.setToolTipText("Create a new playlist");
 		JMenuItem openPList = new JMenuItem("Open Playlist");
-		open.setToolTipText("Open a Playlist.xml file");
+		openPList.setToolTipText("Open a Playlist.xml file");
+		JMenuItem savePList = new JMenuItem("Save Playlist");
+		savePList.setToolTipText("Save current playlist as xml");
+		JMenuItem quit = new JMenuItem("Exit");
+		quit.setToolTipText("Exit program");
 		
 		JMenu edit = new JMenu("Edit");
 		
-		JMenuItem nothing = new JMenuItem("Nothing yet");
-		nothing.setToolTipText("This won't do anything");
+		JMenuItem addPList = new JMenuItem("Add file to Playlist");
+		addPList.setToolTipText("Add a new file to the playlist");
+		JMenuItem addPList2 = new JMenuItem("Add current to Playlist");
+		addPList2.setToolTipText("Add current media to the playlist");
 		
 		JMenu view = new JMenu("View");
 		
 		JMenuItem nothing2 = new JMenuItem("Also nothing");
 		nothing2.setToolTipText("This also won't do anything");
 		
-		JMenu filter = new JMenu("Filter");
+		JMenu filter = new JMenu("Help");
 		
-		JMenuItem nothing3 = new JMenuItem("Nope");
-		nothing3.setToolTipText("This definitely won't do anything");
+		JMenuItem about = new JMenuItem("About...");
+		about.setToolTipText("This doesn't do anything yet");
 		
 		file.add(open);
-		edit.add(nothing);
+		file.add(newPList);
+		file.add(openPList);
+		file.add(savePList);
+		file.add(quit);
+		edit.add(addPList);
+		edit.add(addPList2);
 		view.add(nothing2);
-		filter.add(nothing3);
+		filter.add(about);
 		
 		menu.add(file);
 		menu.add(edit);
@@ -147,7 +169,7 @@ public class GUI extends JFrame {
 				if (isValidFileType(file)) {
 					media.playMedia(file);
 					playButton.setIcon(pause);
-				} else {
+				} else if (file != "-1") {
 					JOptionPane.showMessageDialog(pane, "Unrecognized file type", "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
@@ -155,10 +177,68 @@ public class GUI extends JFrame {
 			
 		});
 		
+		newPList.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				playlist.clearPlaylist();
+				listTitle.setText("New Playlist");
+				list.clear();
+			}
+		});
+		
 		openPList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				openPlaylist();
+				refreshPlaylist();
+			}
+		});
+		
+		savePList.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				savePlaylist();
+			}
+		});
+		
+		quit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				System.exit(0);
+			}
+		});
+		
+		addPList.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				String file = openFile();
+				if (isValidFileType(file)) {
+					playlist.addMedia(file);
+					list.clear();
+					refreshPlaylist();
+				} else if (file != "-1") {
+					JOptionPane.showMessageDialog(pane, "Unrecognized file type", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
+		addPList2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				String file = media.getFileName();
+				if (media.getFileName() != null) {
+					playlist.addMedia(file);
+					list.clear();
+					refreshPlaylist();
+				}
+			}
+		});
+		
+		about.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				JOptionPane.showMessageDialog(pane, "AMP Media Player\n\nBy Lucas Jovalis, Matthew Luu, and Stephen Pangburn", 
+						"About AMP Media Player", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 	}
@@ -175,7 +255,7 @@ public class GUI extends JFrame {
 		pane.add(display, params);
 		media.setCanvas(display);
 		
-		//Timestamp slider
+		//Time-stamp slider
 		slider = new JSlider(0, 1000, 0);
 		setConstraints(params, 0, 3, 1, 6, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(2, 10, 10, 10);
@@ -192,7 +272,7 @@ public class GUI extends JFrame {
 		
 		//Whitespace
 		JLabel blank1 = new JLabel("");
-		setConstraints(params, 1, 4, 1, 1, 1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 0, 4, 2, 1, 1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
 		//Skip back
@@ -220,7 +300,11 @@ public class GUI extends JFrame {
 		prevButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				System.out.println("Go to previous media");
+				String prev = playlist.getPreviousItem(media.getFileName());
+				if (prev != "-1") {
+					media.playMedia(prev);
+					plist.setSelectedIndex(playlist.getIndex(prev));
+				}
 			}
 		});
 		
@@ -240,7 +324,11 @@ public class GUI extends JFrame {
 		skipButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				System.out.println("Go to next media");
+				String next = playlist.getNextItem(media.getFileName());
+				if (next != "-1") {
+					media.playMedia(next);
+					plist.setSelectedIndex(playlist.getIndex(next));
+				}
 			}
 		});
 
@@ -271,7 +359,6 @@ public class GUI extends JFrame {
 		GridBagConstraints params = new GridBagConstraints();
 		
 		//Playlist name
-		JLabel listTitle = new JLabel("New Playlist");
 		setConstraints(params, 6, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 0, 0);
 		pane.add(listTitle, params);
@@ -295,17 +382,37 @@ public class GUI extends JFrame {
 		initToolBar(toolbar, listTitle);
 		pane.add(toolbar, params);
 		
-		//Collect playlist data
-		String[] data = new String[playlist.getPlaylist().size()];
-		populateArrayFromList(data, playlist.getPlaylist());
-		
 		//Playlist display
-		plist = new JList<String>(data);
-		setConstraints(params, 6, 2, 3, 3, 0, 1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH);
+		plist = new JList<String>(list);
+		setConstraints(params, 6, 2, 3, 3, 0, 0, GridBagConstraints.LINE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 10, 10, 10);
+		plist.setFixedCellWidth(50);
 		JScrollPane scroll = new JScrollPane();
 		scroll.getViewport().add(plist);
 		pane.add(scroll, params);
+		
+		
+		save.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				savePlaylist();
+			}
+		});
+		
+		
+		plist.addMouseListener(new MouseAdapter() {
+		    public void mouseClicked(MouseEvent evt) {
+		        JList list = (JList)evt.getSource();
+		        if (evt.getClickCount() == 2) {
+		        	Rectangle r = list.getCellBounds(0, list.getLastVisibleIndex()); 
+		        	if (r != null && r.contains(evt.getPoint())) {
+		        		int index = list.locationToIndex(evt.getPoint());
+		            	media.playMedia(playlist.getPlaylist2().get(index).getFilePath());
+						playButton.setIcon(pause);
+		        	}
+		        }
+		    }
+		});
 	}
 
 
@@ -335,12 +442,22 @@ public class GUI extends JFrame {
 		toolbar.setFloatable(false);	//Prevent dragging
 		
 		
+		repeatButton.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent ev) {
+				if (ev.getStateChange()==ItemEvent.SELECTED){
+					playlist.setRepeat(true);
+				} else if (ev.getStateChange()==ItemEvent.DESELECTED){
+					playlist.setRepeat(false);
+				}
+			}
+		});
+		
 		newPlaylistButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				playlist.clearPlaylist();
 				title.setText("New Playlist");
-				refreshPlaylist();
+				list.clear();
 			}
 		});
 		
@@ -351,6 +468,8 @@ public class GUI extends JFrame {
 				openPlaylist();
 				refreshPlaylist();
 			}
+
+			
 		});
 		
 		
@@ -360,8 +479,9 @@ public class GUI extends JFrame {
 				String file = openFile();
 				if (isValidFileType(file)) {
 					playlist.addMedia(file);
+					list.clear();
 					refreshPlaylist();
-				} else {
+				} else if (file != "-1") {
 					JOptionPane.showMessageDialog(pane, "Unrecognized file type", "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
@@ -372,7 +492,6 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				//TODO: Implement
-				refreshPlaylist();
 			}
 		});
 	}
@@ -419,19 +538,20 @@ public class GUI extends JFrame {
 		});
 	}
 
-	
-	private void refreshPlaylist() {
-		String[] data = new String[playlist.getPlaylist().size()];
-		populateArrayFromList(data, playlist.getPlaylist());
-		plist = new JList<String>(data);
-	}
-	
-	
-	private <T> void populateArrayFromList(T[] arr, ArrayList<T> arrayList) {
-		for (int i = 0; i < arrayList.size(); i++) {
-			arr[i] = arrayList.get(i);
-		}
-    }
+//	
+//	private void refreshPlaylist() {
+//		String[] data = new String[playlist.getPlaylist2().size()];
+//		populateArrayFromList(data, playlist.getPlaylist2());
+//		plist = new JList<String>(data);
+//		plist.revalidate();
+//	}
+//	
+//	
+//	private <T> void populateArrayFromList(String[] data, ArrayList<fileProperty> arrayList) {
+//		for (int i = 0; i < arrayList.size(); i++) {
+//			data[i] = arrayList.get(i).getTitle();
+//		}
+//    }
 
 
 
@@ -463,23 +583,28 @@ public class GUI extends JFrame {
 		JFileChooser fileopen = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter("mp4 files", "mp4");
         fileopen.addChoosableFileFilter(filter);
-        fileopen.setFileFilter(filter);
         filter = new FileNameExtensionFilter("mp3 files", "mp3");
         fileopen.addChoosableFileFilter(filter);
         filter = new FileNameExtensionFilter("avi files", "avi");
         fileopen.addChoosableFileFilter(filter);
+        fileopen.setCurrentDirectory(lastDirectory);
 
         int ret = fileopen.showDialog(new JPanel(), "Open file");
 
         if (ret == JFileChooser.APPROVE_OPTION) {
             String file = fileopen.getSelectedFile().toString();
-            return file;
+            lastDirectory = fileopen.getSelectedFile();
+            if (isValidFileType(file))
+            	return file;
         }
         return "-1";
 	}
 	
 	
 	private void openPlaylist() {
+		playlist.clearPlaylist();
+		list.clear();
+		
 		JFileChooser fileopen = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter("xml files", "xml");
         fileopen.addChoosableFileFilter(filter);
@@ -491,9 +616,34 @@ public class GUI extends JFrame {
             String file = fileopen.getSelectedFile().toString();
             if (file.endsWith("xml")) {
             	playlist.loadPlaylist(file);
-			} else {
+                listTitle.setText(fileopen.getSelectedFile().getName().substring(0, fileopen.getSelectedFile().getName().length()-4));
+			} else if (file != "-1") {
 				JOptionPane.showMessageDialog(pane, "Unrecognized file type", "Error", JOptionPane.ERROR_MESSAGE);
 			}
+        }
+	}
+	
+	
+	private void refreshPlaylist() {
+		for (int i = 0; i < playlist.getPlaylist2().size(); i++) {
+			list.addElement(playlist.getPlaylist2().get(i).getTitle() + " (" + playlist.getPlaylist2().get(i).getLength() + ")");
+		}
+	}
+	
+	
+	private void savePlaylist() {
+		JFileChooser savefile = new JFileChooser();
+        FileFilter filter = new FileNameExtensionFilter("xml file", "xml");
+        savefile.addChoosableFileFilter(filter);
+        savefile.setFileFilter(filter);
+        savefile.setCurrentDirectory(lastDirectory);
+
+        int ret = savefile.showSaveDialog(new JPanel());
+
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            String file = savefile.getSelectedFile().toString();
+            lastDirectory = savefile.getSelectedFile();
+            playlist.savePlaylist(file);
         }
 	}
 	

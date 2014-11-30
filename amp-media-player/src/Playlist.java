@@ -47,9 +47,10 @@ public class Playlist {
 		
 		finder = new findData();
 	
-		playlist.add("C:\\Users\\New Ending\\Music\\Icon For Hire - Icon For Hire (Self-Titled)\\01. Cynics & Critics.mp3");
-		playlist.add("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
-		playlist.add("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
+		
+//		playlist.add("C:\\Users\\New Ending\\Music\\Icon For Hire - Icon For Hire (Self-Titled)\\01. Cynics & Critics.mp3");
+//		playlist.add("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
+//		playlist.add("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
 	}
 	
 	/* INITIAL CODE USING DOM PARSER (DIDN'T WORK, SAVING IN CASE NEEDED)
@@ -94,11 +95,11 @@ public class Playlist {
 	
 	public void clearPlaylist() {
 		playlist.clear();
+		playlist2.clear();
 	}
 	
 
 	public void loadPlaylist(String f) {
-		//Clear Playlist
 		clearPlaylist();
 		
 		//TODO: Add confirmation message (in GUI?) saying that playlist is empty. (placeholders below)
@@ -152,7 +153,10 @@ public class Playlist {
 	}
 	
     
-	public void savePlaylist() {
+	public void savePlaylist(String path) {
+		if (!path.endsWith(".xml")) {
+			path = path + ".xml";
+		}
 		try {
 
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -185,7 +189,7 @@ public class Playlist {
 			
 			
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("file.xml"));
+			StreamResult result = new StreamResult(new File(path));
 
 			transformer.transform(source, result);
 
@@ -205,14 +209,16 @@ public class Playlist {
 	
 	public void addMedia(String f) {
 		//Adds the fileName string into the Arraylist
-		playlist.add(f);
-		System.out.println("addMedia: The media location '" + f + "' has been added to the Playlist.");
-		String format = f;
-		format = format.replace("&amp;", "&");
-		
-		playlist2.add(new fileProperty(finder.getTitle(format), format, finder.getLength(format)));
-		
-		System.out.println("addMedia: New ArrayList Playlist2 = " + playlist2 + "\n"); //for debugging purposes
+		if(!playlist.contains(f)) {
+			playlist.add(f);
+			System.out.println("addMedia: The media location '" + f + "' has been added to the Playlist.");
+			String format = f;
+			format = format.replace("&amp;", "&");
+			
+			playlist2.add(new fileProperty(finder.getTitle(format), format, finder.getLength(format)));
+			
+			System.out.println("addMedia: New ArrayList Playlist2 = " + playlist2 + "\n"); //for debugging purposes
+		}
 	}
 	
 	public String getNextItem(String f) {
@@ -247,6 +253,10 @@ public class Playlist {
 			System.out.println("getNextItem: The file path of the media (" + f + ") was not found in the playlist. Returning -1.");
 			return "-1";
 		}
+	}
+	
+	public int getIndex(String f) {
+		return playlist.indexOf(f);
 	}
 	
 	public String getPreviousItem(String f) {
@@ -298,7 +308,7 @@ public class Playlist {
 
 		Playlist test = new Playlist();
 		test.init();
-		test.savePlaylist();
+		test.savePlaylist("file.xml");
 		test.loadPlaylist("file.xml");
 		test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 		//test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a"); //should return fourth.mp3
