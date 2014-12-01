@@ -75,7 +75,6 @@ public class GUI extends JFrame {
 	 * TODO: Shuffle (MATT)
 	 * TODO: Skip back to end item (MATT)
 	 * TODO: Implement rearrange (ME, MATT)
-	 * TODO: Looping GUI (ME)
 	 * TODO: FullScreen (LUCAS, ME)
 	 */
 	
@@ -400,6 +399,8 @@ public class GUI extends JFrame {
                 media.setLoop(s.getValue(), s.getUpperValue());
                 if (media.getTimestamp() < s.getValue() || media.getTimestamp() > s.getUpperValue()) {
                 	media.setTimestamp(s.getValue());
+                } else {
+                	media.setTimestamp(media.getTimestamp());
                 }
             }
         });
