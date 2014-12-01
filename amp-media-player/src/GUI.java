@@ -3,6 +3,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -51,6 +52,7 @@ public class GUI extends JFrame {
 	JList<String> plist;
 	DefaultListModel list = new DefaultListModel();
 	File lastDirectory = null;
+	
 	Icon play = new ImageIcon("play.png");
 	Icon pause = new ImageIcon("pause.png");
 	Icon next = new ImageIcon("next.png");
@@ -62,12 +64,13 @@ public class GUI extends JFrame {
 	final JLabel listTitle = new JLabel("New Playlist");
 	
 	/*
-	 * TODO: Supported File formats??
-	 * TODO: Implement Delete
-	 * TODO: Implement rearrange
-	 * TODO: Shuffle
-	 * TODO: FullScreen
-	 * TODO: Looping
+	 * TODO: Display time (MONDAY)
+	 * TODO: Implement Delete (MATT)
+	 * TODO: Shuffle (MATT)
+	 * TODO: Skip back to end item (MATT)
+	 * TODO: Implement rearrange (ME, MATT)
+	 * TODO: Looping GUI (ME)
+	 * TODO: FullScreen (LUCAS, ME)
 	 */
 	
 	private class ToolBar extends JToolBar {
@@ -79,8 +82,6 @@ public class GUI extends JFrame {
 	
 	public GUI() {
         playlist = new Playlist();
-//      playlist.addMedia("C:\\Users\\Stephen\\Videos\\ArmchairTheatre-TheCriminals.mp4");
-//		playlist.addMedia("C:\\Users\\Stephen\\Videos\\The Sign of Three.mp4");
         media = new Media();
         init();
     }
@@ -121,8 +122,8 @@ public class GUI extends JFrame {
 		open.setToolTipText("Open a file");
 		JMenuItem newPList = new JMenuItem("New Playlist");
 		newPList.setToolTipText("Create a new playlist");
-		JMenuItem openPList = new JMenuItem("Open Playlist");
-		openPList.setToolTipText("Open a Playlist.xml file");
+		JMenuItem openPList = new JMenuItem("Load Playlist");
+		openPList.setToolTipText("Load a playlist from xml file");
 		JMenuItem savePList = new JMenuItem("Save Playlist");
 		savePList.setToolTipText("Save current playlist as xml");
 		JMenuItem quit = new JMenuItem("Exit");
@@ -140,10 +141,10 @@ public class GUI extends JFrame {
 		JMenuItem nothing2 = new JMenuItem("Also nothing");
 		nothing2.setToolTipText("This also won't do anything");
 		
-		JMenu filter = new JMenu("Help");
+		JMenu help = new JMenu("Help");
 		
 		JMenuItem about = new JMenuItem("About...");
-		about.setToolTipText("This doesn't do anything yet");
+		about.setToolTipText("About AMP Media Player");
 		
 		file.add(open);
 		file.add(newPList);
@@ -153,12 +154,12 @@ public class GUI extends JFrame {
 		edit.add(addPList);
 		edit.add(addPList2);
 		view.add(nothing2);
-		filter.add(about);
+		help.add(about);
 		
 		menu.add(file);
 		menu.add(edit);
 		menu.add(view);
-		menu.add(filter);
+		menu.add(help);
 		
 		setJMenuBar(menu);
 
@@ -332,25 +333,25 @@ public class GUI extends JFrame {
 			}
 		});
 
-		box.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-	            if (box.getSelectedItem() == "0.25x") {
-	            	media.setTimeScale((long) 0.25);
-	            }
-	            if (box.getSelectedItem() == "0.5x") {
-	            	media.setTimeScale((long) 0.5);
-	            }
-	            if (box.getSelectedItem() == "1x") {
-	            	media.setTimeScale((long) 1);
-	            }
-	            if (box.getSelectedItem() == "2x") {
-	            	media.setTimeScale((long) 2);
-	            }
-	            if (box.getSelectedItem() == "4x") {
-	            	media.setTimeScale((long) 4);
-	            }
-	        }
-		});
+//		box.addItemListener(new ItemListener() {
+//			public void itemStateChanged(ItemEvent arg0) {
+//	            if (box.getSelectedItem() == "0.25x") {
+//	            	media.setTimeScale((long) 0.25);
+//	            }
+//	            if (box.getSelectedItem() == "0.5x") {
+//	            	media.setTimeScale((long) 0.5);
+//	            }
+//	            if (box.getSelectedItem() == "1x") {
+//	            	media.setTimeScale((long) 1);
+//	            }
+//	            if (box.getSelectedItem() == "2x") {
+//	            	media.setTimeScale((long) 2);
+//	            }
+//	            if (box.getSelectedItem() == "4x") {
+//	            	media.setTimeScale((long) 4);
+//	            }
+//	        }
+//		});
 
 	}
 	
@@ -359,6 +360,11 @@ public class GUI extends JFrame {
 		GridBagConstraints params = new GridBagConstraints();
 		
 		//Playlist name
+		Font font = new Font("Arial", Font.BOLD, 16);
+		listTitle.setFont(font);
+		listTitle.setPreferredSize(new Dimension(95, 16));
+		listTitle.setMaximumSize(new Dimension(95, 16));
+		listTitle.setMinimumSize(new Dimension(95, 16));
 		setConstraints(params, 6, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 0, 0);
 		pane.add(listTitle, params);
@@ -492,6 +498,10 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				//TODO: Implement
+//				int item = plist.getSelectedIndex();
+//				list.remove(item);
+//				playlist.delete(item); //TODO: Pass in index, METHOD MUST SHIFT ALL ELEMENTS OVER
+//				refreshPlaylist();
 			}
 		});
 	}
@@ -538,34 +548,6 @@ public class GUI extends JFrame {
 		});
 	}
 
-//	
-//	private void refreshPlaylist() {
-//		String[] data = new String[playlist.getPlaylist2().size()];
-//		populateArrayFromList(data, playlist.getPlaylist2());
-//		plist = new JList<String>(data);
-//		plist.revalidate();
-//	}
-//	
-//	
-//	private <T> void populateArrayFromList(String[] data, ArrayList<fileProperty> arrayList) {
-//		for (int i = 0; i < arrayList.size(); i++) {
-//			data[i] = arrayList.get(i).getTitle();
-//		}
-//    }
-
-
-
-//	private void setConstraints(GridBagConstraints params, int x, int y, int height, 
-//								int width, double weightx, double weighty) {
-//		params.gridx = x;
-//		params.gridy = y;
-//		params.gridheight = height;
-//		params.gridwidth = width;
-//		params.weightx = weightx;
-//		params.weighty = weighty;
-//		params.anchor = GridBagConstraints.CENTER;
-//		params.fill = GridBagConstraints.NONE;
-//	}
 	
 	private void setConstraints(GridBagConstraints params, int x, int y, int height, 
 								int width, double weightx, double weighty, int anchor, int fill) {
@@ -587,6 +569,8 @@ public class GUI extends JFrame {
         fileopen.addChoosableFileFilter(filter);
         filter = new FileNameExtensionFilter("avi files", "avi");
         fileopen.addChoosableFileFilter(filter);
+        filter = new FileNameExtensionFilter("m4a files", "m4a");
+        fileopen.addChoosableFileFilter(filter);
         fileopen.setCurrentDirectory(lastDirectory);
 
         int ret = fileopen.showDialog(new JPanel(), "Open file");
@@ -596,15 +580,14 @@ public class GUI extends JFrame {
             lastDirectory = fileopen.getSelectedFile();
             if (isValidFileType(file))
             	return file;
+            else
+            	JOptionPane.showMessageDialog(pane, "Unrecognized file type", "Error", JOptionPane.ERROR_MESSAGE);
         }
         return "-1";
 	}
 	
 	
 	private void openPlaylist() {
-		playlist.clearPlaylist();
-		list.clear();
-		
 		JFileChooser fileopen = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter("xml files", "xml");
         fileopen.addChoosableFileFilter(filter);
@@ -615,6 +598,8 @@ public class GUI extends JFrame {
         if (ret == JFileChooser.APPROVE_OPTION) {
             String file = fileopen.getSelectedFile().toString();
             if (file.endsWith("xml")) {
+        		playlist.clearPlaylist();
+        		list.clear();
             	playlist.loadPlaylist(file);
                 listTitle.setText(fileopen.getSelectedFile().getName().substring(0, fileopen.getSelectedFile().getName().length()-4));
 			} else if (file != "-1") {
@@ -649,7 +634,7 @@ public class GUI extends JFrame {
 	
 	
 	private boolean isValidFileType(String file) {
-		return file.endsWith("mp4") || file.endsWith("mp3") || file.endsWith("avi");
+		return file.endsWith("mp4") || file.endsWith("mp3") || file.endsWith("avi") || file.endsWith("m4a");
 	}
  
 	
