@@ -16,6 +16,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.sql.Timestamp;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import javax.swing.Box;
@@ -53,9 +55,13 @@ public class GUI extends JFrame {
 	private RangeSlider loopSlider;
 	private JToggleButton loopButton;
 	private final Container pane = getContentPane();
+	private final JLabel listTitle = new JLabel("New Playlist");
 	private JList<String> plist;
 	private DefaultListModel list = new DefaultListModel();
 	private File lastDirectory = null;
+	private Timestamp currentTime = new Timestamp((long) 0.0);
+	private Timestamp totalTime = new Timestamp ((long) 0.0);
+	private JLabel timeDisplay;
 	
 	private Icon play = new ImageIcon("play.png");
 	private Icon pause = new ImageIcon("pause.png");
@@ -67,7 +73,6 @@ public class GUI extends JFrame {
 	private Icon loop = new ImageIcon("loop.png");
 	private Icon fullscreen = new ImageIcon("fullscreen.png");
 	private final JButton playButton = new JButton(play);
-	private final JLabel listTitle = new JLabel("New Playlist");
 	
 	/*
 	 * TODO: Display time (MONDAY)
@@ -110,6 +115,11 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				slider.setValue(media.getTimestamp());
+				updateTimestamp();
+				if (media.shouldSkip()) {
+					skip(playlist.getNextItem(media.getFileName()));
+					media.setSkipToFalse();
+				}
 			}
 		});
 		timer.setInitialDelay(1);
@@ -174,6 +184,7 @@ public class GUI extends JFrame {
 				String file = openFile();
 				if (isValidFileType(file)) {
 					media.playMedia(file);
+	            	setTimeDisplay();
 					playButton.setIcon(pause);
 				} else if (file != "-1") {
 					JOptionPane.showMessageDialog(pane, "Unrecognized file type", "Error", JOptionPane.ERROR_MESSAGE);
@@ -276,11 +287,11 @@ public class GUI extends JFrame {
         loopSlider.setUpperValue(0);
 		
 		//Timestamp label
-		JLabel time = new JLabel("00:00/00:00");
+		timeDisplay = new JLabel("00:00/00:00");
 		setConstraints(params, 6, 3, 1, 1, 0, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		Font font = new Font("Arial", Font.PLAIN, 10);
-		time.setFont(font);
-		pane.add(time, params);
+		timeDisplay.setFont(font);
+		pane.add(timeDisplay, params);
 		
 		//Loop toggle
 		loopButton = new JToggleButton(loop);
@@ -332,12 +343,12 @@ public class GUI extends JFrame {
 		prevButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				String prev = playlist.getPreviousItem(media.getFileName());
-				if (prev != "-1") {
-					media.playMedia(prev);
-					plist.setSelectedIndex(playlist.getIndex(prev));
-					loopButton.setSelected(false);
+				if (media.getCurrentTime() < 2000) {
+					skip(playlist.getPreviousItem(media.getFileName()));
+				} else {
+					media.setTimestamp(0);
 				}
+				
 			}
 		});
 		
@@ -357,13 +368,9 @@ public class GUI extends JFrame {
 		skipButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				String next = playlist.getNextItem(media.getFileName());
-				if (next != "-1") {
-					media.playMedia(next);
-					plist.setSelectedIndex(playlist.getIndex(next));
-					loopButton.setSelected(false);
-				}
+				skip(playlist.getNextItem(media.getFileName()));
 			}
+			
 		});
 
 		loopButton.addItemListener(new ItemListener() {
@@ -466,6 +473,7 @@ public class GUI extends JFrame {
 		        	if (r != null && r.contains(evt.getPoint())) {
 		        		int index = list.locationToIndex(evt.getPoint());
 		            	media.playMedia(playlist.getPlaylist2().get(index).getFilePath());
+		            	setTimeDisplay();
 						playButton.setIcon(pause);
 						loopButton.setSelected(false);
 		        	}
@@ -600,6 +608,17 @@ public class GUI extends JFrame {
 				  }
 		});
 	}
+	
+
+	private void skip(String next) {
+		if (next != "-1") {
+			media.playMedia(next);
+        	setTimeDisplay();
+			plist.setSelectedIndex(playlist.getIndex(next));
+			loopButton.setSelected(false);
+			playButton.setIcon(pause);
+		}
+	}
 
 	
 	private void setConstraints(GridBagConstraints params, int x, int y, int height, 
@@ -668,6 +687,23 @@ public class GUI extends JFrame {
 		list.clear();
 		for (int i = 0; i < playlist.getPlaylist2().size(); i++) {
 			list.addElement(playlist.getPlaylist2().get(i).getTitle() + " (" + playlist.getPlaylist2().get(i).getLength() + ")");
+		}
+	}
+	
+	
+	private void setTimeDisplay() {
+		currentTime.setTime((long) 0.0);
+	}
+	
+	
+	private void updateTimestamp() {
+		if (media.getFileName() != null) {
+			currentTime.setTime(media.getCurrentTime());
+			totalTime.setTime(media.getLength() + 1000);
+			NumberFormat format = NumberFormat.getInstance();
+			format.setMinimumIntegerDigits(2);
+			timeDisplay.setText(currentTime.getMinutes() + ":" + format.format(currentTime.getSeconds()) + 
+								"/" + totalTime.getMinutes() + ":" + format.format(totalTime.getSeconds()));
 		}
 	}
 	

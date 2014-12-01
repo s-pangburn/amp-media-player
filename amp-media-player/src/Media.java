@@ -28,6 +28,7 @@ public class Media extends MediaPlayerEventAdapter {
 	private boolean looping, fastForwarding;
 	private long timeScale;	
 	private boolean rewinding;
+	private boolean skipNext;
 	
 	public void init() {
 		videoSurface = new Canvas();
@@ -121,6 +122,18 @@ public class Media extends MediaPlayerEventAdapter {
 		return fileName;
 	}
 	
+	public long getCurrentTime() {
+		return player.getTime();
+	}
+	
+	public boolean shouldSkip() {
+		return skipNext;
+	}
+	
+	public void setSkipToFalse() {
+		skipNext = false;
+	}
+	
 	public void update() {
 		if (looping) {
 			if (getTimestamp() > loopEnd) {
@@ -204,6 +217,7 @@ public class Media extends MediaPlayerEventAdapter {
 	@Override
 	public void finished(MediaPlayer arg0) {
 		// TODO Auto-generated method stub
+		skipNext = true;
 		player.playMedia(fileName);
 		//player.setPosition(temp);
 //		player.pause();
