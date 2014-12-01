@@ -75,7 +75,6 @@ public class GUI extends JFrame {
 	private final JButton playButton = new JButton(play);
 	
 	/*
-	 * TODO: Implement Delete (MATT)
 	 * TODO: Shuffle (MATT)
 	 * TODO: Skip back to end item (MATT)
 	 * TODO: Implement rearrange (ME, MATT)
@@ -149,6 +148,8 @@ public class GUI extends JFrame {
 		addPList.setToolTipText("Add a new file to the playlist");
 		JMenuItem addPList2 = new JMenuItem("Add current to Playlist");
 		addPList2.setToolTipText("Add current media to the playlist");
+		JMenuItem delPList = new JMenuItem("Delete from Playlist");
+		addPList2.setToolTipText("Delete selected item from Playlist");
 		
 		JMenu view = new JMenu("View");
 		
@@ -167,6 +168,7 @@ public class GUI extends JFrame {
 		file.add(quit);
 		edit.add(addPList);
 		edit.add(addPList2);
+		edit.add(delPList);
 		view.add(nothing2);
 		help.add(about);
 		
@@ -214,6 +216,16 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				savePlaylist();
+			}
+		});
+		
+		delPList.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				int item = plist.getSelectedIndex();
+				list.remove(item);
+				playlist.deleteItem(item); 
+				refreshPlaylist();
 			}
 		});
 		
@@ -380,7 +392,7 @@ public class GUI extends JFrame {
 					params.insets = new Insets(2, 10, 10, 2);
 					if (loopSlider.getValue() == 0 && loopSlider.getUpperValue() == 0) {
 				        loopSlider.setValue(media.getTimestamp());
-				        loopSlider.setUpperValue(media.getTimestamp() + 30);
+				        loopSlider.setUpperValue(media.getTimestamp() + 300);
 					}
 			        loopSlider.setPreferredSize(new Dimension(100, 25));
 					pane.remove(slider);
@@ -557,11 +569,10 @@ public class GUI extends JFrame {
 		delPlaylistButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				//TODO: Implement
-//				int item = plist.getSelectedIndex();
-//				list.remove(item);
-//				playlist.delete(item); //TODO: Pass in index, METHOD MUST SHIFT ALL ELEMENTS OVER
-//				refreshPlaylist();
+				int item = plist.getSelectedIndex();
+				list.remove(item);
+				playlist.deleteItem(item); 
+				refreshPlaylist();
 			}
 		});
 	}

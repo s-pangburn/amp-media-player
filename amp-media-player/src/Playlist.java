@@ -171,9 +171,9 @@ public class Playlist {
 			Element song;
 			
 			//Loop amount is equal to the number of files inside the arraylist
-			for(int i = 0; i < playlist.size(); i++) {
+			for(int i = 0; i < playlist2.size(); i++) {
 				//Finds the file path from the arraylist
-				fileName = playlist.get(i);
+				fileName = playlist2.get(i).getFilePath();
 				
 				//Creates a new Media element and puts the media file into the element
 				song = doc.createElement("Media");
@@ -297,16 +297,10 @@ public class Playlist {
 		return "-1";
 	}
 	
-	public void deleteItem(String f) {
+	public void deleteItem(int index) {
 		System.out.println("deleteItem: Before deleting an item - ArrayList playlist2 = " + playlist2);
 		
-		for(int i = 0; i < playlist2.size(); i++) {
-			if(playlist2.get(i).getFilePath() == f) {
-				System.out.println("deleteItem: " + playlist2.get(i).getFilePath() + " has been found in the playlist. Deleting...");
-				playlist2.remove(i);
-				break; //this is so it doesn't delete multiple items
-			}
-		}
+		playlist2.remove(index);
 		
 		System.out.println("deleteItem: After deleting an item - ArrayList playlist2 = " + playlist2 + "\n");
 	}
@@ -338,7 +332,7 @@ public class Playlist {
 		test.addMedia("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
 		test.addMedia("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
 		test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");		
-		test.deleteItem("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
+		//test.deleteItem("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 		test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
 		test.getPreviousItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
 	}
