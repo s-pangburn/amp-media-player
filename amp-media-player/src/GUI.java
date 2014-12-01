@@ -75,7 +75,6 @@ public class GUI extends JFrame {
 	private final JButton playButton = new JButton(play);
 	
 	/*
-	 * TODO: Display time (MONDAY)
 	 * TODO: Implement Delete (MATT)
 	 * TODO: Shuffle (MATT)
 	 * TODO: Skip back to end item (MATT)
@@ -287,7 +286,7 @@ public class GUI extends JFrame {
         loopSlider.setUpperValue(0);
 		
 		//Timestamp label
-		timeDisplay = new JLabel("00:00/00:00");
+		timeDisplay = new JLabel("0:00/0:00");
 		setConstraints(params, 6, 3, 1, 1, 0, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		Font font = new Font("Arial", Font.PLAIN, 10);
 		timeDisplay.setFont(font);
@@ -702,8 +701,14 @@ public class GUI extends JFrame {
 			totalTime.setTime(media.getLength() + 1000);
 			NumberFormat format = NumberFormat.getInstance();
 			format.setMinimumIntegerDigits(2);
-			timeDisplay.setText(currentTime.getMinutes() + ":" + format.format(currentTime.getSeconds()) + 
-								"/" + totalTime.getMinutes() + ":" + format.format(totalTime.getSeconds()));
+			if (media.getLength() > 3600000) {
+				timeDisplay.setText((currentTime.getHours()-16) + ":" + format.format(currentTime.getMinutes()) + ":" + format.format(currentTime.getSeconds()) + 
+						"/" + (totalTime.getHours()-16) + ":" + format.format(totalTime.getMinutes()) + ":" + format.format(totalTime.getSeconds()));
+			} else {
+				timeDisplay.setText(currentTime.getMinutes() + ":" + format.format(currentTime.getSeconds()) + 
+						"/" + totalTime.getMinutes() + ":" + format.format(totalTime.getSeconds()));
+			}
+			
 		}
 	}
 	
