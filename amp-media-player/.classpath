@@ -4,6 +4,8 @@
 	<classpathentry kind="lib" path="lib/jars/jna-3.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jars/platform-3.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jars/vlcj-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/jars/tika-app-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/jars/xuggle-xuggler-5.4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.8.0_25"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

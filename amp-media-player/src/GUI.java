@@ -39,29 +39,35 @@ import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.metal.MetalSliderUI;
 
 public class GUI extends JFrame {
-	
-	private Playlist playlist;
+
 	public Media media;
+	private Playlist playlist;
 	private JSlider slider;
-	final Container pane = getContentPane();
-	JList<String> plist;
-	DefaultListModel list = new DefaultListModel();
-	File lastDirectory = null;
+	private RangeSlider loopSlider;
+	private JToggleButton loopButton;
+	private final Container pane = getContentPane();
+	private JList<String> plist;
+	private DefaultListModel list = new DefaultListModel();
+	private File lastDirectory = null;
 	
-	Icon play = new ImageIcon("play.png");
-	Icon pause = new ImageIcon("pause.png");
-	Icon next = new ImageIcon("next.png");
-	Icon prev = new ImageIcon("prev.png");
-	Icon shuffle = new ImageIcon("shuffle.png");
-	Icon repeat = new ImageIcon("repeat.png");
-	Icon savelist = new ImageIcon("save.png");
-	final JButton playButton = new JButton(play);
-	final JLabel listTitle = new JLabel("New Playlist");
+	private Icon play = new ImageIcon("play.png");
+	private Icon pause = new ImageIcon("pause.png");
+	private Icon next = new ImageIcon("next.png");
+	private Icon prev = new ImageIcon("prev.png");
+	private Icon shuffle = new ImageIcon("shuffle.png");
+	private Icon repeat = new ImageIcon("repeat.png");
+	private Icon savelist = new ImageIcon("save.png");
+	private Icon loop = new ImageIcon("loop.png");
+	private Icon fullscreen = new ImageIcon("fullscreen.png");
+	private final JButton playButton = new JButton(play);
+	private final JLabel listTitle = new JLabel("New Playlist");
 	
 	/*
 	 * TODO: Display time (MONDAY)
@@ -251,7 +257,7 @@ public class GUI extends JFrame {
 		//Media screen
 		Canvas display = new Canvas();
 		display.setBackground(Color.black);
-		setConstraints(params, 0, 0, 3, 6, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 0, 0, 3, 7, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 2, 10);
 		pane.add(display, params);
 		media.setCanvas(display);
@@ -259,21 +265,37 @@ public class GUI extends JFrame {
 		//Time-stamp slider
 		slider = new JSlider(0, 1000, 0);
 		setConstraints(params, 0, 3, 1, 6, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
-		params.insets = new Insets(2, 10, 10, 10);
+		params.insets = new Insets(2, 10, 10, 2);
 		initSlider(slider);
 		pane.add(slider, params);
+
+		//Looping slider
+		loopSlider = new RangeSlider(0, 1000);
+		setConstraints(params, 0, 3, 1, 6, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+		params.insets = new Insets(2, 10, 10, 2);
+		loopSlider.setValue(0);
+        loopSlider.setUpperValue(0);
 		
-		//Speed control
-		String[] speeds = new String[] {"0.25x", "0.5x", "1x", "2x", "4x"};
-		final JComboBox<String> box = new JComboBox<String>(speeds);
-		setConstraints(params, 0, 4, 1, 1, 0, 0, GridBagConstraints.PAGE_END, GridBagConstraints.BOTH);
+		//Timestamp label
+		JLabel time = new JLabel("00:00/00:00");
+		setConstraints(params, 6, 3, 1, 1, 0, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+		Font font = new Font("Arial", Font.PLAIN, 10);
+		time.setFont(font);
+		pane.add(time, params);
+		
+		//Loop toggle
+		loopButton = new JToggleButton(loop);
+		setConstraints(params, 0, 4, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(5, 5, 5, 5);
-		box.setSelectedItem("1x");
-		//pane.add(box,  params);
+		loopButton.setToolTipText("Start a new loop");
+		loopButton.setPreferredSize(new Dimension(45, 25));
+		loopButton.setMaximumSize(new Dimension(45, 25));
+		loopButton.setMinimumSize(new Dimension(45, 25));
+		pane.add(loopButton,  params);
 		
 		//Whitespace
 		JLabel blank1 = new JLabel("");
-		setConstraints(params, 0, 4, 2, 1, 1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 1, 4, 1, 1, 1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
 		//Skip back
@@ -296,6 +318,16 @@ public class GUI extends JFrame {
 		JLabel blank2 = new JLabel("");
 		setConstraints(params, 5, 4, 1, 1, 1, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
 		pane.add(blank2, params);
+		
+		//Fullscreen button
+		JButton fullscreenButton = new JButton(fullscreen);
+		setConstraints(params, 6, 4, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.VERTICAL);
+		params.insets = new Insets(5, 5, 5, 5);
+		fullscreenButton.setToolTipText("Fullscreen mode");
+		fullscreenButton.setPreferredSize(new Dimension(45, 25));
+		fullscreenButton.setMaximumSize(new Dimension(45, 30));
+		fullscreenButton.setMinimumSize(new Dimension(45, 30));
+		pane.add(fullscreenButton,  params);
 
 		
 		prevButton.addActionListener(new ActionListener() {
@@ -305,6 +337,7 @@ public class GUI extends JFrame {
 				if (prev != "-1") {
 					media.playMedia(prev);
 					plist.setSelectedIndex(playlist.getIndex(prev));
+					loopButton.setSelected(false);
 				}
 			}
 		});
@@ -329,29 +362,47 @@ public class GUI extends JFrame {
 				if (next != "-1") {
 					media.playMedia(next);
 					plist.setSelectedIndex(playlist.getIndex(next));
+					loopButton.setSelected(false);
 				}
 			}
 		});
 
-//		box.addItemListener(new ItemListener() {
-//			public void itemStateChanged(ItemEvent arg0) {
-//	            if (box.getSelectedItem() == "0.25x") {
-//	            	media.setTimeScale((long) 0.25);
-//	            }
-//	            if (box.getSelectedItem() == "0.5x") {
-//	            	media.setTimeScale((long) 0.5);
-//	            }
-//	            if (box.getSelectedItem() == "1x") {
-//	            	media.setTimeScale((long) 1);
-//	            }
-//	            if (box.getSelectedItem() == "2x") {
-//	            	media.setTimeScale((long) 2);
-//	            }
-//	            if (box.getSelectedItem() == "4x") {
-//	            	media.setTimeScale((long) 4);
-//	            }
-//	        }
-//		});
+		loopButton.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent ev) {
+				if (ev.getStateChange()==ItemEvent.SELECTED){
+					GridBagConstraints params = new GridBagConstraints();
+					setConstraints(params, 0, 3, 1, 6, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+					params.insets = new Insets(2, 10, 10, 2);
+					if (loopSlider.getValue() == 0 && loopSlider.getUpperValue() == 0) {
+				        loopSlider.setValue(media.getTimestamp());
+				        loopSlider.setUpperValue(media.getTimestamp() + 30);
+					}
+			        loopSlider.setPreferredSize(new Dimension(100, 25));
+					pane.remove(slider);
+					pane.add(loopSlider, params);
+					pane.revalidate();
+	                media.setLoop(loopSlider.getValue(), loopSlider.getUpperValue());
+				} else if (ev.getStateChange()==ItemEvent.DESELECTED){
+					GridBagConstraints params = new GridBagConstraints();
+					setConstraints(params, 0, 3, 1, 6, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+					params.insets = new Insets(2, 10, 10, 2);
+					pane.remove(loopSlider);
+					pane.add(slider, params);
+					pane.revalidate();
+					media.stopLoop();
+				}
+			}
+		});
+		
+		loopSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                RangeSlider s = (RangeSlider) e.getSource();
+                media.setLoop(s.getValue(), s.getUpperValue());
+                if (media.getTimestamp() < s.getValue() || media.getTimestamp() > s.getUpperValue()) {
+                	media.setTimestamp(s.getValue());
+                }
+            }
+        });
 
 	}
 	
@@ -365,32 +416,32 @@ public class GUI extends JFrame {
 		listTitle.setPreferredSize(new Dimension(95, 16));
 		listTitle.setMaximumSize(new Dimension(95, 16));
 		listTitle.setMinimumSize(new Dimension(95, 16));
-		setConstraints(params, 6, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 7, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 0, 0);
 		pane.add(listTitle, params);
 
 		//Whitespace
 		JLabel blank1 = new JLabel("");
-		setConstraints(params, 7, 0, 1, 1, 0.1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 8, 0, 1, 1, 0.1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
 		//Save Button
 		JButton save = new JButton(savelist);
 		save.setToolTipText("Save Playlist");
-		setConstraints(params, 8, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 9, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 0, 11);
 		pane.add(save, params);
 		
 		//New, Load, Add, Del, Shuffle, Repeat bar
 		ToolBar toolbar = new ToolBar();
-		setConstraints(params, 6, 1, 1, 3, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 7, 1, 1, 3, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 9, 0, 10);
 		initToolBar(toolbar, listTitle);
 		pane.add(toolbar, params);
 		
 		//Playlist display
 		plist = new JList<String>(list);
-		setConstraints(params, 6, 2, 3, 3, 0, 0, GridBagConstraints.LINE_END, GridBagConstraints.BOTH);
+		setConstraints(params, 7, 2, 3, 3, 0, 0, GridBagConstraints.LINE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 10, 10, 10);
 		plist.setFixedCellWidth(50);
 		JScrollPane scroll = new JScrollPane();
@@ -415,6 +466,7 @@ public class GUI extends JFrame {
 		        		int index = list.locationToIndex(evt.getPoint());
 		            	media.playMedia(playlist.getPlaylist2().get(index).getFilePath());
 						playButton.setIcon(pause);
+						loopButton.setSelected(false);
 		        	}
 		        }
 		    }
@@ -578,10 +630,12 @@ public class GUI extends JFrame {
         if (ret == JFileChooser.APPROVE_OPTION) {
             String file = fileopen.getSelectedFile().toString();
             lastDirectory = fileopen.getSelectedFile();
-            if (isValidFileType(file))
+            if (isValidFileType(file)) {
+            	loopButton.setSelected(false);
             	return file;
-            else
+            } else {
             	JOptionPane.showMessageDialog(pane, "Unrecognized file type", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
         return "-1";
 	}
@@ -610,6 +664,7 @@ public class GUI extends JFrame {
 	
 	
 	private void refreshPlaylist() {
+		list.clear();
 		for (int i = 0; i < playlist.getPlaylist2().size(); i++) {
 			list.addElement(playlist.getPlaylist2().get(i).getTitle() + " (" + playlist.getPlaylist2().get(i).getLength() + ")");
 		}
