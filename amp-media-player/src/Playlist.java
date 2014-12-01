@@ -265,11 +265,10 @@ public class Playlist {
 	}
 	
 	public String getPreviousItem(String f) {
-		//TODO: Check that the item being searched is not the last in the playlist (check repeat true)
 		for(int i = 0; i < playlist2.size(); i++) {
 			if(playlist2.get(i).getFilePath() == f) {
 				//check that the file path is not the last item in the playlistt
-				if(playlist2.indexOf(f) != 0) {
+				if(i != 0) {
 					System.out.println("getPreviousItem: The filepath '" + f + "' was found in the playlist.");
 					System.out.println("getPreviousItem: Returning the following: " + playlist2.get(i - 1).getFilePath() + "\n");
 					return playlist2.get(i - 1).getFilePath();
@@ -278,8 +277,16 @@ public class Playlist {
 				//if code reaches this far, this means that the item was the first item in the playlist
 				else {
 					System.out.println("getPreviousItem: The filepath '" + f + "' was the first item in the playlist.");
-					System.out.println("getPreviousItem: Returning -1 because this was the first item in the playlist. \n");
-					return "-1";
+					
+					if(repeat == true) {
+						System.out.println("getPreviousItem: Because repeat is on, returning the following: " + playlist2.get(playlist2.size() - 1).getFilePath() + "\n");
+						return playlist2.get(playlist2.size() - 1).getFilePath(); //returns first item in the playlist
+					}
+					
+					else {
+						System.out.println("getPreviousItem: Returning -1 because this was the first item in the playlist. \n");
+						return "-1";
+					}
 				}
 
 			}
@@ -295,6 +302,7 @@ public class Playlist {
 		
 		for(int i = 0; i < playlist2.size(); i++) {
 			if(playlist2.get(i).getFilePath() == f) {
+				System.out.println("deleteItem: " + playlist2.get(i).getFilePath() + " has been found in the playlist. Deleting...");
 				playlist2.remove(i);
 				break; //this is so it doesn't delete multiple items
 			}
@@ -327,12 +335,11 @@ public class Playlist {
 		test.init();
 		test.savePlaylist("file.xml");
 		test.loadPlaylist("file.xml");
-		test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 		test.addMedia("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
 		test.addMedia("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
+		test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");		
 		test.deleteItem("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
-		
 		test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
-		test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
+		test.getPreviousItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
 	}
 }
