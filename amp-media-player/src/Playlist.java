@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Locale;
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +17,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
  
 
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
 public class Playlist {
 	private ArrayList<String> playlist;
 	private ArrayList<fileProperty> playlist2;
-	private ArrayList<String> shuffleQueue; //ArrayList that is made for shuffling method
+	private ArrayList<fileProperty> shuffleQueue; //ArrayList that is made for shuffling method
 	
 	private boolean shuffle;
 	private boolean repeat;
@@ -41,7 +42,6 @@ public class Playlist {
 	public void init() {
 		playlist = new ArrayList<String>();
 		playlist2 = new ArrayList<fileProperty>();
-		shuffleQueue = new ArrayList<String>();
 		shuffle = false;
 		repeat = false;
 		
@@ -305,6 +305,14 @@ public class Playlist {
 		System.out.println("deleteItem: After deleting an item - ArrayList playlist2 = " + playlist2 + "\n");
 	}
 	
+	public void shuffle() {
+		shuffleQueue = new ArrayList<fileProperty>(playlist2);
+		Collections.shuffle(shuffleQueue);
+		
+		System.out.println("shuffle: ArrayList Playlist2 = " + playlist2);
+		System.out.println("shuffle: ArrayList shuffleQueue = " + shuffleQueue);
+	}
+	
 	public void setRepeat(boolean r) {
 		repeat = r;
 	}
@@ -313,8 +321,16 @@ public class Playlist {
 		return repeat;
 	}
 	
+	public void setShuffle(boolean s) {
+		shuffle = s;
+	}
 	
-	//TODO: (ToNOTDo really) Don't use this anymore, this playlist still has xml formatting (and just the file paths anyway)
+	public boolean getShuffle() {
+		return shuffle;
+	}
+	
+	
+	//TODO: (To NOT Do really) Don't use this anymore, this playlist still has xml formatting (and just the file paths anyway)
 	public ArrayList<String> getPlaylist() {
 		return playlist;
 	}
@@ -322,12 +338,16 @@ public class Playlist {
 	public ArrayList<fileProperty> getPlaylist2() {
 		return playlist2;
 	}
+	
+	public ArrayList<fileProperty> getShuffleQueue() {
+		return shuffleQueue;
+	}
 
 	public static void main(String[] args) {
 
 		Playlist test = new Playlist();
 		test.init();
-		test.savePlaylist("file.xml");
+		//test.savePlaylist("file.xml");
 		test.loadPlaylist("file.xml");
 		test.addMedia("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
 		test.addMedia("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
@@ -335,5 +355,6 @@ public class Playlist {
 		//test.deleteItem("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 		test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
 		test.getPreviousItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
+		test.shuffle();
 	}
 }
