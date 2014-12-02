@@ -42,7 +42,7 @@ public class Playlist {
 	public void init() {
 		playlist = new ArrayList<String>();
 		playlist2 = new ArrayList<fileProperty>();
-		shuffle = false;
+		shuffle = true;
 		repeat = false;
 		
 		finder = new findData();
@@ -223,34 +223,69 @@ public class Playlist {
 	
 	public String getNextItem(String f) {
 		//TODO: Check that the item being searched is not the last in the playlist (check repeat true) 
-		for(int i = 0; i < playlist2.size(); i++) {
-			if(playlist2.get(i).getFilePath() == f) {
-				//check that the file path is not the last item in the playlistt
-				if(i != playlist2.size() - 1) {
-					System.out.println("getNextItem: The filepath '" + f + "' was found in the playlist.");
-					System.out.println("getNextItem: Returning the following: " + playlist2.get(i + 1).getFilePath() + "\n");
-					return playlist2.get(i + 1).getFilePath();
-				}
-
-				//if code reaches this far, this means that the item was the last item in the playlist
-				else {
-					System.out.println("getNextItem: The filepath '" + f + "' was the last item in the playlist.");
-
-					//check if repeat is on
-					if(repeat == true) {
-						System.out.println("getNextItem: Because repeat is on, returning the following: " + playlist2.get(0).getFilePath() + "\n");
-						return playlist2.get(0).getFilePath(); //returns first item in the playlist
+		if(shuffle == false) {
+			for(int i = 0; i < playlist2.size(); i++) {
+				if(playlist2.get(i).getFilePath() == f) {
+					//check that the file path is not the last item in the playlistt
+					if(i != playlist2.size() - 1) {
+						System.out.println("getNextItem: The filepath '" + f + "' was found in the playlist.");
+						System.out.println("getNextItem: Returning the following: " + playlist2.get(i + 1).getFilePath() + "\n");
+						return playlist2.get(i + 1).getFilePath();
 					}
 
+					//if code reaches this far, this means that the item was the last item in the playlist
 					else {
-						System.out.println("getNextItem: Returning -1 because this was the last item in the playlist. \n");
-						return "-1";
+						System.out.println("getNextItem: The filepath '" + f + "' was the last item in the playlist.");
+
+						//check if repeat is on
+						if(repeat == true) {
+							System.out.println("getNextItem: Because repeat is on, returning the following: " + playlist2.get(0).getFilePath() + "\n");
+							return playlist2.get(0).getFilePath(); //returns first item in the playlist
+						}
+
+						else {
+							System.out.println("getNextItem: Returning -1 because this was the last item in the playlist. \n");
+							return "-1";
+						}
 					}
 				}
 			}
 		}
+		
+		//shuffle is true here. searches shuffleQueue instead
+		else if(shuffle == true && shuffleQueue != null) {
+			for(int i = 0; i < shuffleQueue.size(); i++) {
+				if(shuffleQueue.get(i).getFilePath() == f) {
+					if(i != shuffleQueue.size() - 1) {
+						System.out.println("getNextItem: The filepath '" + f + "' was found in the shuffleQueue playlist.");
+						System.out.println("getNextItem: Returning the following: " + shuffleQueue.get(i + 1).getFilePath() + "\n");
+						return shuffleQueue.get(i + 1).getFilePath();
+					}
+					
+					else {
+						System.out.println("getNextItem: The filepath '" + f + "' was the last item in the shuffleQueue playlist.");
+
+						//check if repeat is on
+						if(repeat == true) {
+							System.out.println("getNextItem: Because repeat is on, returning the following: " + shuffleQueue.get(0).getFilePath() + "\n");
+							return shuffleQueue.get(0).getFilePath(); //returns first item in the playlist
+						}
+
+						else {
+							System.out.println("getNextItem: Returning -1 because this was the last item in the playlist. \n");
+							return "-1";
+						}
+					}
+				}
+			}
+		}
+		
+		else if(shuffleQueue == null) {
+			System.out.println("getNextItem: Shuffle has not been called. ShuffleQueue has not been created yet.");
+		}
+		
 		//if code reaches this far, this means that the file was not in the playlist
-		System.out.println("getNextItem: The file path of the media (" + f + ") was not found in the playlist. Returning -1.");
+		System.out.println("getNextItem: The file path of the media (" + f + ") was not found in any playlist. Returning -1. \n");
 		return "-1";
 	}
 
@@ -265,52 +300,87 @@ public class Playlist {
 	}
 	
 	public String getPreviousItem(String f) {
-		for(int i = 0; i < playlist2.size(); i++) {
-			if(playlist2.get(i).getFilePath() == f) {
-				//check that the file path is not the last item in the playlistt
-				if(i != 0) {
-					System.out.println("getPreviousItem: The filepath '" + f + "' was found in the playlist.");
-					System.out.println("getPreviousItem: Returning the following: " + playlist2.get(i - 1).getFilePath() + "\n");
-					return playlist2.get(i - 1).getFilePath();
-				}
+		if(shuffle == false) {
+			for(int i = 0; i < playlist2.size(); i++) {
+				if(playlist2.get(i).getFilePath() == f) {
+					//check that the file path is not the last item in the playlistt
+					if(i != 0) {
+						System.out.println("getPreviousItem: The filepath '" + f + "' was found in the playlist.");
+						System.out.println("getPreviousItem: Returning the following: " + playlist2.get(i - 1).getFilePath() + "\n");
+						return playlist2.get(i - 1).getFilePath();
+					}
 
-				//if code reaches this far, this means that the item was the first item in the playlist
-				else {
-					System.out.println("getPreviousItem: The filepath '" + f + "' was the first item in the playlist.");
-					
-					if(repeat == true) {
-						System.out.println("getPreviousItem: Because repeat is on, returning the following: " + playlist2.get(playlist2.size() - 1).getFilePath() + "\n");
-						return playlist2.get(playlist2.size() - 1).getFilePath(); //returns first item in the playlist
+					//if code reaches this far, this means that the item was the first item in the playlist
+					else {
+						System.out.println("getPreviousItem: The filepath '" + f + "' was the first item in the playlist.");
+
+						if(repeat == true) {
+							System.out.println("getPreviousItem: Because repeat is on, returning the following: " + playlist2.get(playlist2.size() - 1).getFilePath() + "\n");
+							return playlist2.get(playlist2.size() - 1).getFilePath(); //returns first item in the playlist
+						}
+
+						else {
+							System.out.println("getPreviousItem: Returning -1 because this was the first item in the playlist. \n");
+							return "-1";
+						}
+					}
+
+				}
+			}
+		}
+		
+		else if(shuffle == true && shuffleQueue != null) {
+			for(int i = 0; i < shuffleQueue.size(); i++) {
+				if(shuffleQueue.get(i).getFilePath() == f) {
+					if(i != 0 ) {
+						System.out.println("getPreviousItem: The filepath '" + f + "' was found in the shuffleQueue playlist.");
+						System.out.println("getPreviousItem: Returning the following: " + shuffleQueue.get(i - 1).getFilePath() + "\n");
+						return shuffleQueue.get(i - 1).getFilePath();
 					}
 					
 					else {
-						System.out.println("getPreviousItem: Returning -1 because this was the first item in the playlist. \n");
-						return "-1";
+						System.out.println("getPreviousItem: The filepath '" + f + "' was the first item in the shuffleQueue playlist.");
+
+						if(repeat == true) {
+							System.out.println("getPreviousItem: Because repeat is on, returning the following: " + shuffleQueue.get(shuffleQueue.size() - 1).getFilePath() + "\n");
+							return shuffleQueue.get(shuffleQueue.size() - 1).getFilePath(); //returns first item in the playlist
+						}
+
+						else {
+							System.out.println("getPreviousItem: Returning -1 because this was the first item in the playlist.");
+							return "-1";
+						}
 					}
 				}
-
 			}
+		}
+		
+		else if(shuffleQueue == null) {
+			System.out.println("getPreviousItem: Shuffle has not been called. ShuffleQueue has not been created yet.");
 		}
 
 		//if code reaches this far, this means that the file was not in the playlist
-		System.out.println("getPreviousItem: The file path of the media (" + f + ") was not found in the playlist. Returning -1. \n");
+		System.out.println("getPreviousItem: The file path of the media (" + f + ") was not found in any playlist. Returning -1. \n");
 		return "-1";
 	}
 	
 	public void deleteItem(int index) {
 		System.out.println("deleteItem: Before deleting an item - ArrayList playlist2 = " + playlist2);
-		
 		playlist2.remove(index);
-		
 		System.out.println("deleteItem: After deleting an item - ArrayList playlist2 = " + playlist2 + "\n");
 	}
 	
 	public void shuffle() {
-		shuffleQueue = new ArrayList<fileProperty>(playlist2);
-		Collections.shuffle(shuffleQueue);
+		if(shuffle == true) {
+			shuffleQueue = new ArrayList<fileProperty>(playlist2);
+			Collections.shuffle(shuffleQueue);
+
+			System.out.println("shuffle: ArrayList Playlist2 = " + playlist2);
+			System.out.println("shuffle: ArrayList shuffleQueue = " + shuffleQueue + "\n");
+		}
 		
-		System.out.println("shuffle: ArrayList Playlist2 = " + playlist2);
-		System.out.println("shuffle: ArrayList shuffleQueue = " + shuffleQueue);
+		else
+			System.out.println("shuffle: Shuffle is not on. Nothing was shuffled. \n");
 	}
 	
 	public void setRepeat(boolean r) {
@@ -353,8 +423,9 @@ public class Playlist {
 		test.addMedia("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
 		test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");		
 		//test.deleteItem("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
+		//test.shuffle();
 		test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
 		test.getPreviousItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
-		test.shuffle();
+		
 	}
 }
