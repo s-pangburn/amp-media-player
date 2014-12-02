@@ -487,6 +487,7 @@ public class GUI extends JFrame {
 		            	setTimeDisplay();
 						playButton.setIcon(pause);
 						loopButton.setSelected(false);
+						playlist.shuffle();
 		        	}
 		        }
 		    }
@@ -520,6 +521,16 @@ public class GUI extends JFrame {
 		toolbar.setFloatable(false);	//Prevent dragging
 		
 		
+		shuffleButton.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent ev) {
+				if (ev.getStateChange()==ItemEvent.SELECTED){
+					playlist.setShuffle(true);
+				} else if (ev.getStateChange()==ItemEvent.DESELECTED){
+					playlist.setShuffle(false);
+				}
+			}
+		});
+		
 		repeatButton.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent ev) {
 				if (ev.getStateChange()==ItemEvent.SELECTED){
@@ -534,6 +545,7 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				playlist.clearPlaylist();
+				playlist.shuffle();
 				title.setText("New Playlist");
 				list.clear();
 			}
@@ -685,6 +697,7 @@ public class GUI extends JFrame {
         		playlist.clearPlaylist();
         		list.clear();
             	playlist.loadPlaylist(file);
+            	playlist.shuffle();
                 listTitle.setText(fileopen.getSelectedFile().getName().substring(0, fileopen.getSelectedFile().getName().length()-4));
 			} else if (file != "-1") {
 				JOptionPane.showMessageDialog(pane, "Unrecognized file type", "Error", JOptionPane.ERROR_MESSAGE);
@@ -698,6 +711,7 @@ public class GUI extends JFrame {
 		for (int i = 0; i < playlist.getPlaylist2().size(); i++) {
 			list.addElement(playlist.getPlaylist2().get(i).getTitle() + " (" + playlist.getPlaylist2().get(i).getLength() + ")");
 		}
+		playlist.shuffle();
 	}
 	
 	
