@@ -383,6 +383,23 @@ public class Playlist {
 			System.out.println("shuffle: Shuffle is not on. Nothing was shuffled. \n");
 	}
 	
+	public void swapPosition(String firstFile, String secondFile) {
+		int index1 = 0;
+		int index2 = 0;
+		
+		for(int i = 0; i < playlist2.size(); i++) {
+			if(playlist2.get(i).getFilePath() == firstFile)
+				index1 = i;
+			if(playlist2.get(i).getFilePath() == secondFile)
+				index2 = i;
+		}
+		
+		System.out.println("swapPosition: Before swap - ArrayList Playlist2: " + playlist2);
+		Collections.swap(playlist2, index1, index2);
+		System.out.println("swapPosition: After swap - ArrayList Playlist2: " + playlist2 + "\n");
+		
+	}
+	
 	public void setRepeat(boolean r) {
 		repeat = r;
 	}
@@ -424,8 +441,9 @@ public class Playlist {
 		test.addMedia("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");		
 		//test.deleteItem("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3");
 		//test.shuffle();
-		test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
-		test.getPreviousItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
+		test.swapPosition("C:\\Users\\New Ending\\Music\\Lights - The Listening\\09-lights-february_air.mp3", "C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
+		//test.getNextItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\4. Overtime - EP - Satellites.m4a");
+		//test.getPreviousItem("C:\\Users\\New Ending\\Music\\Cash Cash - Overtime [EP] (iTunes)\\2. Overtime - EP - Overtime.m4a");
 		
 	}
 }
