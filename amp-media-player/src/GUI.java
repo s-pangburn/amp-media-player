@@ -76,7 +76,6 @@ public class GUI extends JFrame {
 	
 	/*
 	 * TODO: Implement rearrange (ME, MATT)
-	 * TODO: FullScreen (LUCAS, ME)
 	 */
 	
 	private class ToolBar extends JToolBar {
@@ -113,6 +112,11 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent event) {
 				slider.setValue(media.getTimestamp());
 				updateTimestamp();
+				if (media.isPaused()) {
+					playButton.setIcon(play);
+				} else {
+					playButton.setIcon(pause);
+				}
 				if (media.shouldSkip()) {
 					skip(playlist.getNextItem(media.getFileName()));
 					media.setSkipToFalse();

@@ -141,8 +141,14 @@ public class Media extends MediaPlayerEventAdapter {
 	}
 	
 	public void playPause() {
-		if (player.isPlaying()) pause();
-		else play();
+		if (player.isPlaying()) {
+			pause();
+			paused = true;
+		}
+		else {
+			play();
+			paused = false;
+		}
 	}
 	
 	public void setLoop(int s, int e) {
@@ -273,6 +279,10 @@ public class Media extends MediaPlayerEventAdapter {
 	
 	public long getLength() {
 		return player.getLength();
+	}
+	
+	public boolean isPaused() {
+		return paused;
 	}
 	
 	
