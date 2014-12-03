@@ -62,6 +62,8 @@ public class GUI extends JFrame {
 	private Timestamp currentTime = new Timestamp((long) 0.0);
 	private Timestamp totalTime = new Timestamp ((long) 0.0);
 	private JLabel timeDisplay;
+
+	private Canvas display = new Canvas();
 	
 	private Icon play = new ImageIcon("play.png");
 	private Icon pause = new ImageIcon("pause.png");
@@ -95,9 +97,9 @@ public class GUI extends JFrame {
 	private void init() {
 		pane.setLayout(new GridBagLayout());
 
+		drawPlaylist();
 		drawControls();
 		drawMenu();
-		drawPlaylist();
 		
 		
 		setTitle("AMP Media Player");
@@ -108,7 +110,6 @@ public class GUI extends JFrame {
 		pack();
 		
 		Timer timer = new Timer(1, new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent event) {
 				slider.setValue(media.getTimestamp());
 				updateTimestamp();
@@ -125,6 +126,13 @@ public class GUI extends JFrame {
 		});
 		timer.setInitialDelay(1);
 		timer.start(); 
+		
+//		display.revalidate();
+//		pane.revalidate();
+//		revalidate();
+//		
+//		pane.repaint();
+//		repaint();
 	}
 	
 	
@@ -156,8 +164,8 @@ public class GUI extends JFrame {
 		
 		JMenu view = new JMenu("View");
 		
-		JMenuItem fullscreen = new JMenuItem("Fullscreen (Not functional)");
-		fullscreen.setToolTipText("This won't do anything");
+		JMenuItem fullscreen = new JMenuItem("Fullscreen");
+		fullscreen.setToolTipText("Enter fullscreen mode");
 		
 		JMenu help = new JMenu("Help");
 		
@@ -286,7 +294,6 @@ public class GUI extends JFrame {
 		GridBagConstraints params = new GridBagConstraints();
 		
 		//Media screen
-		Canvas display = new Canvas();
 		display.setBackground(Color.black);
 		setConstraints(params, 0, 0, 3, 7, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 2, 10);
@@ -490,7 +497,7 @@ public class GUI extends JFrame {
 		
 		//Playlist display
 		plist = new JList<String>(list);
-		setConstraints(params, 7, 2, 3, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
+		setConstraints(params, 7, 2, 2, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 10, 10, 10);
 		plist.setFixedCellWidth(50);
 		JScrollPane scroll = new JScrollPane();
