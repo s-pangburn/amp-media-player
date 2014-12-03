@@ -75,8 +75,6 @@ public class GUI extends JFrame {
 	private final JButton playButton = new JButton(play);
 	
 	/*
-	 * TODO: Shuffle (MATT)
-	 * TODO: Skip back to end item (MATT)
 	 * TODO: Implement rearrange (ME, MATT)
 	 * TODO: FullScreen (LUCAS, ME)
 	 */
@@ -102,12 +100,13 @@ public class GUI extends JFrame {
 		drawMenu();
 		drawPlaylist();
 		
-		pack();
 		
 		setTitle("AMP Media Player");
 		setMinimumSize(new Dimension(650, 420));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		pack();
 		
 		Timer timer = new Timer(1, new ActionListener() {
 			@Override
@@ -153,8 +152,8 @@ public class GUI extends JFrame {
 		
 		JMenu view = new JMenu("View");
 		
-		JMenuItem nothing2 = new JMenuItem("Also nothing");
-		nothing2.setToolTipText("This also won't do anything");
+		JMenuItem fullscreen = new JMenuItem("Fullscreen (Not functional)");
+		fullscreen.setToolTipText("This won't do anything");
 		
 		JMenu help = new JMenu("Help");
 		
@@ -169,7 +168,7 @@ public class GUI extends JFrame {
 		edit.add(addPList);
 		edit.add(addPList2);
 		edit.add(delPList);
-		view.add(nothing2);
+		view.add(fullscreen);
 		help.add(about);
 		
 		menu.add(file);
@@ -262,6 +261,13 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		fullscreen.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				media.setFullscreen(true);
+			}
+		});
+		
 		about.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -285,7 +291,7 @@ public class GUI extends JFrame {
 		
 		//Time-stamp slider
 		slider = new JSlider(0, 1000, 0);
-		setConstraints(params, 0, 3, 1, 6, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 0, 3, 1, 6, 0, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(2, 10, 10, 2);
 		initSlider(slider);
 		pane.add(slider, params);
@@ -383,6 +389,14 @@ public class GUI extends JFrame {
 			}
 			
 		});
+		
+		fullscreenButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				media.setFullscreen(true);
+			}
+			
+		});
 
 		loopButton.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent ev) {
@@ -444,23 +458,35 @@ public class GUI extends JFrame {
 		setConstraints(params, 8, 0, 1, 1, 0.1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
+		//Rearrange buttons
+		setConstraints(params, 9, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		params.insets = new Insets(0, 0, 0, 0);
+		
+//		JButton shuffleButton = new JButton(shuffle);
+//		shuffleButton.setToolTipText("Shift item up");
+//		pane.add(shuffleButton);
+//		
+//		JButton repeatButton = new JButton(repeat);
+//		repeatButton.setToolTipText("Shift item down");
+//		pane.add(repeatButton);
+		
 		//Save Button
 		JButton save = new JButton(savelist);
 		save.setToolTipText("Save Playlist");
-		setConstraints(params, 9, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 10, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 0, 11);
 		pane.add(save, params);
 		
 		//New, Load, Add, Del, Shuffle, Repeat bar
 		ToolBar toolbar = new ToolBar();
-		setConstraints(params, 7, 1, 1, 3, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
+		setConstraints(params, 7, 1, 1, 4, 0, 0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 9, 0, 10);
 		initToolBar(toolbar, listTitle);
 		pane.add(toolbar, params);
 		
 		//Playlist display
 		plist = new JList<String>(list);
-		setConstraints(params, 7, 2, 3, 3, 0, 0, GridBagConstraints.LINE_END, GridBagConstraints.BOTH);
+		setConstraints(params, 7, 2, 3, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 10, 10, 10);
 		plist.setFixedCellWidth(50);
 		JScrollPane scroll = new JScrollPane();
@@ -525,6 +551,7 @@ public class GUI extends JFrame {
 			public void itemStateChanged(ItemEvent ev) {
 				if (ev.getStateChange()==ItemEvent.SELECTED){
 					playlist.setShuffle(true);
+					playlist.shuffle();
 				} else if (ev.getStateChange()==ItemEvent.DESELECTED){
 					playlist.setShuffle(false);
 				}

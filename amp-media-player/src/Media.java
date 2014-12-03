@@ -31,6 +31,7 @@ public class Media extends MediaPlayerEventAdapter {
 	private Canvas videoSurface, fullscreenCanvas;
 	private int loopStart, loopEnd;
 	private boolean looping, fastForwarding;
+	private boolean paused = false;
 	private long timeScale;	
 	private boolean rewinding;
 	private boolean skipNext;
@@ -92,10 +93,12 @@ public class Media extends MediaPlayerEventAdapter {
 	
 	public void pause() {
 		player.pause();
+		paused = true;
 	}
 	
 	public void play() {
 		player.play();
+		paused = false;
 	}
 	
 	public void setLoop(int s, int e) {
@@ -173,17 +176,21 @@ public class Media extends MediaPlayerEventAdapter {
 	}
 	
 	public void setFullscreen(boolean f) {
-//		if (f) {
+		if (fileName != null) {
 			long t = player.getTime();
 			player.stop();
 			fullscreenCanvas.setVisible(f);
 			player.setVideoSurface(playerFactory.newVideoSurface((f) ? fullscreenCanvas : videoSurface));
 			if (f) fullscreen.add(fullscreenCanvas);
 			fullscreen.setAlwaysOnTop(f);
-			fullscreen.setVisible(f);
 //			if (f) fullscreenCanvas.requestFocus();
+			fullscreen.setVisible(f);
 			player.play();
 			player.setTime(t);
+			if (paused) {
+				player.pause();
+			}
+		}
 //		} else {
 //			long t = player.getTime();
 //			player.stop();

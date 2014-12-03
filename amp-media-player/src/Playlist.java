@@ -263,9 +263,8 @@ public class Playlist {
 					}
 					
 					else {
-						System.out.println("getNextItem: The filepath '" + f + "' was the last item in the shuffleQueue playlist.");
-						System.out.println("getNextItem: Returning -1 because this was the last item in the playlist. \n");
-						return "-1";
+						System.out.println("getNextItem: Because repeat is on, returning the following: " + playlist2.get(0).getFilePath() + "\n");
+						return shuffleQueue.get(0).getFilePath(); //returns first item in the playlist
 					}
 				}
 			}
@@ -331,16 +330,9 @@ public class Playlist {
 					
 					else {
 						System.out.println("getPreviousItem: The filepath '" + f + "' was the first item in the shuffleQueue playlist.");
-
-						if(repeat == true) {
-							System.out.println("getPreviousItem: Because repeat is on, returning the following: " + shuffleQueue.get(shuffleQueue.size() - 1).getFilePath() + "\n");
-							return shuffleQueue.get(shuffleQueue.size() - 1).getFilePath(); //returns first item in the playlist
-						}
-
-						else {
-							System.out.println("getPreviousItem: Returning -1 because this was the first item in the playlist.");
-							return "-1";
-						}
+						System.out.println("getPreviousItem: Because repeat is on, returning the following: " + shuffleQueue.get(shuffleQueue.size() - 1).getFilePath() + "\n");
+						return shuffleQueue.get(shuffleQueue.size() - 1).getFilePath(); //returns first item in the playlist
+					
 					}
 				}
 			}
