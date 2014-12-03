@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -36,6 +38,7 @@ public class Media extends MediaPlayerEventAdapter {
 	private boolean rewinding;
 	private boolean skipNext;
 	private JFrame fullscreen;
+	private long toPause = -1; 
 
 	
 	public void init() {
@@ -49,13 +52,16 @@ public class Media extends MediaPlayerEventAdapter {
 		int height = (int)screenSize.getHeight();
 		fullscreen.setSize(width, height);
 		fullscreen.setUndecorated(true);
-		fullscreen.addKeyListener(new KeyListener() {
+		fullscreenCanvas.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyPressed(KeyEvent key) {
 				switch (key.getKeyCode()) {
 				case KeyEvent.VK_ESCAPE:
 					setFullscreen(false);
+					break;
+				case KeyEvent.VK_SPACE:
+					playPause();
 					break;
 				}
 			}
@@ -65,6 +71,39 @@ public class Media extends MediaPlayerEventAdapter {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
 			}
+		});
+		fullscreenCanvas.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				//playPause();
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+  				playPause();
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
 		});
 		
 		player = playerFactory.newEmbeddedMediaPlayer(new DefaultFullScreenStrategy(fullscreen));
@@ -99,6 +138,11 @@ public class Media extends MediaPlayerEventAdapter {
 	public void play() {
 		player.play();
 		paused = false;
+	}
+	
+	public void playPause() {
+		if (player.isPlaying()) pause();
+		else play();
 	}
 	
 	public void setLoop(int s, int e) {
@@ -177,14 +221,19 @@ public class Media extends MediaPlayerEventAdapter {
 	
 	public void setFullscreen(boolean f) {
 		if (fileName != null) {
+			if (player.isPlaying()) toPause = -1;
+			else {
+				toPause = player.getTime();
+				player.mute(true);
+			}
 			long t = player.getTime();
 			player.stop();
 			fullscreenCanvas.setVisible(f);
 			player.setVideoSurface(playerFactory.newVideoSurface((f) ? fullscreenCanvas : videoSurface));
 			if (f) fullscreen.add(fullscreenCanvas);
 			fullscreen.setAlwaysOnTop(f);
-//			if (f) fullscreenCanvas.requestFocus();
 			fullscreen.setVisible(f);
+			if (f) fullscreenCanvas.requestFocus();
 			player.play();
 			player.setTime(t);
 			if (paused) {
@@ -214,6 +263,12 @@ public class Media extends MediaPlayerEventAdapter {
 				setTimestamp(loopStart);
 			}
 		}
+		if (toPause > -1) {
+			pause();
+			player.setTime(toPause);
+			player.mute(false);
+			toPause = -1;
+		}
 	}
 	
 	public long getLength() {
@@ -225,45 +280,54 @@ public class Media extends MediaPlayerEventAdapter {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Media media = new Media();
+                final Media media = new Media();
                 JFrame frame = new JFrame("test");
                 
                 Canvas canvas = new Canvas();
+        		frame.addKeyListener(new KeyListener() {
+
+        			@Override
+        			public void keyPressed(KeyEvent key) {
+        				switch (key.getKeyCode()) {
+        				case KeyEvent.VK_F:
+        					media.setFullscreen(true);
+        					break;
+        				case KeyEvent.VK_SPACE:
+        					media.playPause();
+        					break;
+        				}
+        			}
+        			@Override
+        			public void keyReleased(KeyEvent arg0) {
+        			}
+        			@Override
+        			public void keyTyped(KeyEvent arg0) {
+        			}
+        		});
                 canvas.setVisible(true);
                 
-//        		canvas.addKeyListener(new KeyListener() {
-//
-//        			@Override
-//        			public void keyPressed(KeyEvent key) {
-//        				System.out.println("test");
-//        				
-//        			}
-//        			@Override
-//        			public void keyReleased(KeyEvent arg0) {
-//        			}
-//        			@Override
-//        			public void keyTyped(KeyEvent arg0) {
-//        			}
-//        		});
                 
                 media.setCanvas(canvas);
                 
                 frame.add(canvas);
                 //frame.add(media.mediaPlayer());
                 
+        		
                 frame.setLocation(100,100);
                 frame.setSize(1050,600);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);		
                 
                 media.playMedia("C:\\Users\\Chalenged\\Downloads\\Advanced Warfare In Depth- Gung-Ho Perk (Shotgun Penalty, Bugs, & Accuracy).mp4");
+//                try {
+//                	Thread.sleep(1000);
+//                } catch(InterruptedException ex) {} 
+//                media.pause();
                 
-                
-//                
+////                
 //                try {
 //                	Thread.sleep(5000);
 //                } catch(InterruptedException ex) {} 
-//                System.out.println(media.getLength());
 //                media.setFullscreen(true);
 //
 //                try {
@@ -314,6 +378,7 @@ public class Media extends MediaPlayerEventAdapter {
 		// TODO Auto-generated method stub
 		skipNext = true;
 		player.playMedia(fileName);
+		toPause = 0;
 		//player.setPosition(temp);
 //		player.pause();
 	}
