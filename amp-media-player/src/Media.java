@@ -38,6 +38,7 @@ public class Media extends MediaPlayerEventAdapter {
 	private boolean skipNext;
 	private JFrame fullscreen;
 	private long toPause = -1; 
+	private boolean lockFullscreen = false;
 
 	
 	public void init() {
@@ -219,6 +220,8 @@ public class Media extends MediaPlayerEventAdapter {
 	public void setFullscreen(boolean f) {
 //		if (f) {
 //			toPause = !player.isPlaying();
+			if (lockFullscreen) return;
+			lockFullscreen = true;
 			if (player.isPlaying()) toPause = -1;
 			else {
 				toPause = player.getTime();
@@ -263,6 +266,7 @@ public class Media extends MediaPlayerEventAdapter {
 			player.mute(false);
 			toPause = -1;
 		}
+		lockFullscreen = false;
 	}
 	
 	public long getLength() {
