@@ -1,5 +1,9 @@
 
 import java.awt.Canvas;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -9,6 +13,7 @@ import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
+import uk.co.caprica.vlcj.player.embedded.DefaultFullScreenStrategy;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
@@ -23,17 +28,45 @@ public class Media extends MediaPlayerEventAdapter {
 	private String fileName;
 	private MediaPlayerFactory playerFactory; 
 	private EmbeddedMediaPlayer player;
-	private Canvas videoSurface;
+	private Canvas videoSurface, fullscreenCanvas;
 	private int loopStart, loopEnd;
 	private boolean looping, fastForwarding;
 	private long timeScale;	
 	private boolean rewinding;
 	private boolean skipNext;
+	private JFrame fullscreen;
+
 	
 	public void init() {
 		videoSurface = new Canvas();
+		fullscreenCanvas = new Canvas();
 		playerFactory = new MediaPlayerFactory();
-		player = playerFactory.newEmbeddedMediaPlayer();
+		
+		fullscreen = new JFrame();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int width = (int)screenSize.getWidth();
+		int height = (int)screenSize.getHeight();
+		fullscreen.setSize(width, height);
+		fullscreen.setUndecorated(true);
+		fullscreen.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyPressed(KeyEvent key) {
+				switch (key.getKeyCode()) {
+				case KeyEvent.VK_ESCAPE:
+					setFullscreen(false);
+					break;
+				}
+			}
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+			}
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+			}
+		});
+		
+		player = playerFactory.newEmbeddedMediaPlayer(new DefaultFullScreenStrategy(fullscreen));
 		looping = fastForwarding = false;
 		loopStart = loopEnd = 0;
 		timeScale = 1;
@@ -43,6 +76,7 @@ public class Media extends MediaPlayerEventAdapter {
 	
 	public void setCanvas(Canvas c) {
 		player.setVideoSurface(playerFactory.newVideoSurface(c));
+		videoSurface = c;
 	}
 	
 	public EmbeddedMediaPlayer mediaPlayer() {
@@ -134,6 +168,36 @@ public class Media extends MediaPlayerEventAdapter {
 		skipNext = false;
 	}
 	
+	public void toggleFullscreen() {
+		setFullscreen(!fullscreenCanvas.isVisible());
+	}
+	
+	public void setFullscreen(boolean f) {
+//		if (f) {
+			long t = player.getTime();
+			player.stop();
+			fullscreenCanvas.setVisible(f);
+			player.setVideoSurface(playerFactory.newVideoSurface((f) ? fullscreenCanvas : videoSurface));
+			if (f) fullscreen.add(fullscreenCanvas);
+			fullscreen.setAlwaysOnTop(f);
+			fullscreen.setVisible(f);
+//			if (f) fullscreenCanvas.requestFocus();
+			player.play();
+			player.setTime(t);
+//		} else {
+//			long t = player.getTime();
+//			player.stop();
+//			fullscreenCanvas.setVisible(false);
+//			player.setVideoSurface(playerFactory.newVideoSurface(videoSurface));
+//			fullscreen.setAlwaysOnTop(false);
+//			fullscreen.setVisible(false);
+//			player.play();
+//			player.setTime(t);
+//		}
+	}
+	
+	
+	
 	public void update() {
 		if (looping) {
 			if (getTimestamp() > loopEnd) {
@@ -159,6 +223,22 @@ public class Media extends MediaPlayerEventAdapter {
                 
                 Canvas canvas = new Canvas();
                 canvas.setVisible(true);
+                
+//        		canvas.addKeyListener(new KeyListener() {
+//
+//        			@Override
+//        			public void keyPressed(KeyEvent key) {
+//        				System.out.println("test");
+//        				
+//        			}
+//        			@Override
+//        			public void keyReleased(KeyEvent arg0) {
+//        			}
+//        			@Override
+//        			public void keyTyped(KeyEvent arg0) {
+//        			}
+//        		});
+                
                 media.setCanvas(canvas);
                 
                 frame.add(canvas);
@@ -169,12 +249,20 @@ public class Media extends MediaPlayerEventAdapter {
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);		
                 
-                media.playMedia("C:\\Users\\Chalenged\\Downloads\\Smash Bros. WiiU Music Preview.mp4");
+                media.playMedia("C:\\Users\\Chalenged\\Downloads\\Advanced Warfare In Depth- Gung-Ho Perk (Shotgun Penalty, Bugs, & Accuracy).mp4");
+                
+                
 //                
-                try {
-                	Thread.sleep(5000);
-                } catch(InterruptedException ex) {} 
-                System.out.println(media.getLength());
+//                try {
+//                	Thread.sleep(5000);
+//                } catch(InterruptedException ex) {} 
+//                System.out.println(media.getLength());
+//                media.setFullscreen(true);
+//
+//                try {
+//                	Thread.sleep(5000);
+//                } catch(InterruptedException ex) {} 
+//                media.setFullscreen(false);
 //                media.setLoop(490, 510);
 //                media.setTimestamp(800);
             }

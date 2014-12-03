@@ -264,17 +264,8 @@ public class Playlist {
 					
 					else {
 						System.out.println("getNextItem: The filepath '" + f + "' was the last item in the shuffleQueue playlist.");
-
-						//check if repeat is on
-						if(repeat == true) {
-							System.out.println("getNextItem: Because repeat is on, returning the following: " + shuffleQueue.get(0).getFilePath() + "\n");
-							return shuffleQueue.get(0).getFilePath(); //returns first item in the playlist
-						}
-
-						else {
-							System.out.println("getNextItem: Returning -1 because this was the last item in the playlist. \n");
-							return "-1";
-						}
+						System.out.println("getNextItem: Returning -1 because this was the last item in the playlist. \n");
+						return "-1";
 					}
 				}
 			}
