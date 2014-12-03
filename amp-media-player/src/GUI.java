@@ -73,6 +73,8 @@ public class GUI extends JFrame {
 	private Icon repeat = new ImageIcon("repeat.png");
 	private Icon savelist = new ImageIcon("save.png");
 	private Icon loop = new ImageIcon("loop.png");
+	private Icon shiftup = new ImageIcon("shiftup.png");
+	private Icon shiftdown = new ImageIcon("shiftdown.png");
 	private Icon fullscreen = new ImageIcon("fullscreen.png");
 	private final JButton playButton = new JButton(play);
 	
@@ -127,12 +129,7 @@ public class GUI extends JFrame {
 		timer.setInitialDelay(1);
 		timer.start(); 
 		
-//		display.revalidate();
-//		pane.revalidate();
-//		revalidate();
-//		
-//		pane.repaint();
-//		repaint();
+		
 	}
 	
 	
@@ -470,16 +467,21 @@ public class GUI extends JFrame {
 		pane.add(blank1, params);
 		
 		//Rearrange buttons
-		setConstraints(params, 9, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
-		params.insets = new Insets(0, 0, 0, 0);
+		ToolBar shiftBar = new ToolBar();
+		setConstraints(params, 7, 4, 1, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
+		params.insets = new Insets(0, 9, 0, 10);
 		
-//		JButton shuffleButton = new JButton(shuffle);
-//		shuffleButton.setToolTipText("Shift item up");
-//		pane.add(shuffleButton);
-//		
-//		JButton repeatButton = new JButton(repeat);
-//		repeatButton.setToolTipText("Shift item down");
-//		pane.add(repeatButton);
+		shiftBar.add(Box.createHorizontalGlue());	// Whitespace
+		
+		JButton shiftUp = new JButton(shiftup);
+		shiftUp.setToolTipText("Shift item up");
+		shiftBar.add(shiftUp);
+		
+		JButton shiftDown = new JButton(shiftdown);
+		shiftDown.setToolTipText("Shift item down");
+		shiftBar.add(shiftDown);
+		shiftBar.setFloatable(false);
+		pane.add(shiftBar, params);
 		
 		//Save Button
 		JButton save = new JButton(savelist);
@@ -498,7 +500,7 @@ public class GUI extends JFrame {
 		//Playlist display
 		plist = new JList<String>(list);
 		setConstraints(params, 7, 2, 2, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
-		params.insets = new Insets(0, 10, 10, 10);
+		params.insets = new Insets(0, 10, 0, 10);
 		plist.setFixedCellWidth(50);
 		JScrollPane scroll = new JScrollPane();
 		scroll.getViewport().add(plist);
@@ -528,6 +530,28 @@ public class GUI extends JFrame {
 		        	}
 		        }
 		    }
+		});
+		
+		shiftUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				int item = plist.getSelectedIndex();
+				if (item != 0)
+					playlist.swapPosition(item, item-1);
+				refreshPlaylist();
+				plist.setSelectedIndex(item-1);
+			}
+		});
+		
+		shiftDown.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				int item = plist.getSelectedIndex();
+				if (item != playlist.getSize()-1)
+					playlist.swapPosition(item, item+1);
+				refreshPlaylist();
+				plist.setSelectedIndex(item+1);
+			}
 		});
 	}
 
@@ -803,6 +827,7 @@ public class GUI extends JFrame {
             public void run() {
                 GUI gui = new GUI();
                 gui.setVisible(true);
+                gui.refreshPlaylist();
             }
         });
     }
