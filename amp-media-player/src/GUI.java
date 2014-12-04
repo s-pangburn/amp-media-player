@@ -62,6 +62,8 @@ public class GUI extends JFrame {
 	private Timestamp currentTime = new Timestamp((long) 0.0);
 	private Timestamp totalTime = new Timestamp ((long) 0.0);
 	private JLabel timeDisplay;
+
+	private Canvas display = new Canvas();
 	
 	private Icon play = new ImageIcon("play.png");
 	private Icon pause = new ImageIcon("pause.png");
@@ -71,6 +73,8 @@ public class GUI extends JFrame {
 	private Icon repeat = new ImageIcon("repeat.png");
 	private Icon savelist = new ImageIcon("save.png");
 	private Icon loop = new ImageIcon("loop.png");
+	private Icon shiftup = new ImageIcon("shiftup.png");
+	private Icon shiftdown = new ImageIcon("shiftdown.png");
 	private Icon fullscreen = new ImageIcon("fullscreen.png");
 	private final JButton playButton = new JButton(play);
 	
@@ -95,9 +99,9 @@ public class GUI extends JFrame {
 	private void init() {
 		pane.setLayout(new GridBagLayout());
 
+		drawPlaylist();
 		drawControls();
 		drawMenu();
-		drawPlaylist();
 		
 		
 		setTitle("AMP Media Player");
@@ -108,7 +112,6 @@ public class GUI extends JFrame {
 		pack();
 		
 		Timer timer = new Timer(1, new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent event) {
 				slider.setValue(media.getTimestamp());
 				updateTimestamp();
@@ -125,6 +128,8 @@ public class GUI extends JFrame {
 		});
 		timer.setInitialDelay(1);
 		timer.start(); 
+		
+		
 	}
 	
 	
@@ -156,8 +161,8 @@ public class GUI extends JFrame {
 		
 		JMenu view = new JMenu("View");
 		
-		JMenuItem fullscreen = new JMenuItem("Fullscreen (Not functional)");
-		fullscreen.setToolTipText("This won't do anything");
+		JMenuItem fullscreen = new JMenuItem("Fullscreen");
+		fullscreen.setToolTipText("Enter fullscreen mode");
 		
 		JMenu help = new JMenu("Help");
 		
@@ -286,7 +291,6 @@ public class GUI extends JFrame {
 		GridBagConstraints params = new GridBagConstraints();
 		
 		//Media screen
-		Canvas display = new Canvas();
 		display.setBackground(Color.black);
 		setConstraints(params, 0, 0, 3, 7, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH);
 		params.insets = new Insets(10, 10, 2, 10);
@@ -463,16 +467,21 @@ public class GUI extends JFrame {
 		pane.add(blank1, params);
 		
 		//Rearrange buttons
-		setConstraints(params, 9, 0, 1, 1, 0, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
-		params.insets = new Insets(0, 0, 0, 0);
+		ToolBar shiftBar = new ToolBar();
+		setConstraints(params, 7, 4, 1, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
+		params.insets = new Insets(0, 9, 0, 10);
 		
-//		JButton shuffleButton = new JButton(shuffle);
-//		shuffleButton.setToolTipText("Shift item up");
-//		pane.add(shuffleButton);
-//		
-//		JButton repeatButton = new JButton(repeat);
-//		repeatButton.setToolTipText("Shift item down");
-//		pane.add(repeatButton);
+		shiftBar.add(Box.createHorizontalGlue());	// Whitespace
+		
+		JButton shiftUp = new JButton(shiftup);
+		shiftUp.setToolTipText("Shift item up");
+		shiftBar.add(shiftUp);
+		
+		JButton shiftDown = new JButton(shiftdown);
+		shiftDown.setToolTipText("Shift item down");
+		shiftBar.add(shiftDown);
+		shiftBar.setFloatable(false);
+		pane.add(shiftBar, params);
 		
 		//Save Button
 		JButton save = new JButton(savelist);
@@ -490,8 +499,8 @@ public class GUI extends JFrame {
 		
 		//Playlist display
 		plist = new JList<String>(list);
-		setConstraints(params, 7, 2, 3, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
-		params.insets = new Insets(0, 10, 10, 10);
+		setConstraints(params, 7, 2, 2, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
+		params.insets = new Insets(0, 10, 0, 10);
 		plist.setFixedCellWidth(50);
 		JScrollPane scroll = new JScrollPane();
 		scroll.getViewport().add(plist);
@@ -521,6 +530,28 @@ public class GUI extends JFrame {
 		        	}
 		        }
 		    }
+		});
+		
+		shiftUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				int item = plist.getSelectedIndex();
+				if (item != 0)
+					playlist.swapPosition(item, item-1);
+				refreshPlaylist();
+				plist.setSelectedIndex(item-1);
+			}
+		});
+		
+		shiftDown.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				int item = plist.getSelectedIndex();
+				if (item != playlist.getSize()-1)
+					playlist.swapPosition(item, item+1);
+				refreshPlaylist();
+				plist.setSelectedIndex(item+1);
+			}
 		});
 	}
 
@@ -796,6 +827,7 @@ public class GUI extends JFrame {
             public void run() {
                 GUI gui = new GUI();
                 gui.setVisible(true);
+                gui.refreshPlaylist();
             }
         });
     }
