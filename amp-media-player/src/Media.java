@@ -48,12 +48,12 @@ public class Media extends MediaPlayerEventAdapter {
 		playerFactory = new MediaPlayerFactory();
 		
 		fullscreen = new JFrame();
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //gets screen size for fullscreen
 		int width = (int)screenSize.getWidth();
 		int height = (int)screenSize.getHeight();
 		fullscreen.setSize(width, height);
-		fullscreen.setUndecorated(true);
-		fullscreenCanvas.addKeyListener(new KeyListener() {
+		fullscreen.setUndecorated(true); 
+		fullscreenCanvas.addKeyListener(new KeyListener() { //keylisteners for fullscreen
 
 			@Override
 			public void keyPressed(KeyEvent key) {
@@ -73,7 +73,7 @@ public class Media extends MediaPlayerEventAdapter {
 			public void keyTyped(KeyEvent arg0) {
 			}
 		});
-		fullscreenCanvas.addMouseListener(new MouseListener() {
+		fullscreenCanvas.addMouseListener(new MouseListener() { //mouse listener (NOTE: DOESN'T WORK)
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -107,17 +107,17 @@ public class Media extends MediaPlayerEventAdapter {
 			
 		});
 		
-		player = playerFactory.newEmbeddedMediaPlayer(new DefaultFullScreenStrategy(fullscreen));
+		player = playerFactory.newEmbeddedMediaPlayer(new DefaultFullScreenStrategy(fullscreen)); //creates the media player
 		looping = fastForwarding = false;
 		loopStart = loopEnd = 0;
 		timeScale = 1;
 		rewinding = false;
-		player.addMediaPlayerEventListener(this);
+		player.addMediaPlayerEventListener(this); //adds the event listeners for things such as update
 	}
 	
 	public void setCanvas(Canvas c) {
-		player.setVideoSurface(playerFactory.newVideoSurface(c));
-		videoSurface = c;
+		player.setVideoSurface(playerFactory.newVideoSurface(c)); //sets video on the canvas
+		videoSurface = c; 
 	}
 	
 	public EmbeddedMediaPlayer mediaPlayer() {
@@ -142,7 +142,7 @@ public class Media extends MediaPlayerEventAdapter {
 		paused = false;
 	}
 	
-	public void playPause() {
+	public void playPause() { //toggles between play/pause
 		if (player.isPlaying()) {
 			pause();
 			paused = true;
@@ -172,16 +172,16 @@ public class Media extends MediaPlayerEventAdapter {
 	}
 	
 	public int getTimestamp() {
-		return (int)(player.getPosition() * TIMESTAMPMAX);
+		return (int)(player.getPosition() * TIMESTAMPMAX); //returns position from 0 to 1000 (default)
 	}
 	
 	public void setTimestamp(int pos) {
-		player.setPosition((float)(pos / TIMESTAMPMAX));
+		player.setPosition((float)(pos / TIMESTAMPMAX)); //sets position on scale from 0 to 1000 (default)
 	}
 	
 	public void setTimeScale(long t) {
 		timeScale = t;
-		if (fastForwarding) t = t*2;
+		if (fastForwarding) t = t*2; //fastforwarding is twice as fast
 		player.setRate(t);
 	}
 	
@@ -224,30 +224,30 @@ public class Media extends MediaPlayerEventAdapter {
 	}
 	
 	public void toggleFullscreen() {
-		setFullscreen(!fullscreenCanvas.isVisible());
+		setFullscreen(!fullscreenCanvas.isVisible()); 
 	}
 	
 	public void setFullscreen(boolean f) {
-		if (fileName != null) {
+		if (fileName != null) { //ensures something is playing
 //		if (f) {
 //			toPause = !player.isPlaying();
-			if (lockFullscreen) return;
+			if (lockFullscreen) return; //prevents fullscreen from happening too quickly to give VLC time to set up
 			lockFullscreen = true;
-			if (player.isPlaying()) toPause = -1;
+			if (player.isPlaying()) toPause = -1; 
 			else {
-				toPause = player.getTime();
-				player.mute(true);
+				toPause = player.getTime(); //sets to pause to the time the video is at
+				player.mute(true); //mutes to make pausing not play sound when switching between fullscreen
 			}
-			long t = player.getTime();
-			player.stop();
+			long t = player.getTime(); //t is to reset time after changing video to fullscreen
+			player.stop(); //stops the player so it can switch to/from fullscreen window
 			fullscreenCanvas.setVisible(f);
-			player.setVideoSurface(playerFactory.newVideoSurface((f) ? fullscreenCanvas : videoSurface));
+			player.setVideoSurface(playerFactory.newVideoSurface((f) ? fullscreenCanvas : videoSurface)); //sets the surface to appropriate canvas
 			if (f) fullscreen.add(fullscreenCanvas);
 			fullscreen.setAlwaysOnTop(f);
 			fullscreen.setVisible(f);
-			if (f) fullscreenCanvas.requestFocus();
+			if (f) fullscreenCanvas.requestFocus(); //gives canvas focus for the keylisteners
 			player.play();
-			player.setTime(t);
+			player.setTime(t); //resets the time to where it was
 			if (paused) {
 				player.pause();
 			}
@@ -268,20 +268,20 @@ public class Media extends MediaPlayerEventAdapter {
 	
 	public void update() {
 		if (looping) {
-			if (getTimestamp() > loopEnd) {
+			if (getTimestamp() > loopEnd) { //if past timestamp set back to beginning
 				setTimestamp(loopStart);
 			}
-			else if (getTimestamp() < loopStart) {
+			else if (getTimestamp() < loopStart) { //if before timestamp set to beginning
 				setTimestamp(loopStart);
 			}
 		}
-		if (toPause > -1) {
+		if (toPause > -1) { //video won't pause right after loading, so this is a workaround
 			pause();
 			player.setTime(toPause);
 			player.mute(false);
 			toPause = -1;
 		}
-		lockFullscreen = false;
+		lockFullscreen = false; //allows fullscreen to happen
 	}
 	
 	public long getLength() {
@@ -293,7 +293,7 @@ public class Media extends MediaPlayerEventAdapter {
 	}
 	
 	
-	public static void main(final String[] args) {
+	public static void main(final String[] args) { //test main
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -359,7 +359,7 @@ public class Media extends MediaPlayerEventAdapter {
 	
 	public Media() {
 
-        NativeLibrary.addSearchPath(
+        NativeLibrary.addSearchPath( //searchpath for VLC libraries (32 bit only)
             RuntimeUtil.getLibVlcLibraryName(), "C:\\Program Files (x86)\\VideoLAN\\VLC"
         );
         Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
@@ -393,9 +393,9 @@ public class Media extends MediaPlayerEventAdapter {
 	@Override
 	public void finished(MediaPlayer arg0) {
 		// TODO Auto-generated method stub
-		skipNext = true;
-		player.playMedia(fileName);
-		toPause = 0;
+		skipNext = true; //used for GUI 
+		player.playMedia(fileName); //replays media
+		toPause = 0; //pauses at beginning
 		//player.setPosition(temp);
 //		player.pause();
 	}
@@ -488,7 +488,7 @@ public class Media extends MediaPlayerEventAdapter {
 	@Override
 	public void positionChanged(MediaPlayer arg0, float arg1) {
 		// TODO Auto-generated method stub
-		update();
+		update(); //calls update function often
 	}
 
 	@Override
