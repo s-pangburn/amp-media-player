@@ -115,7 +115,8 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent event) {
 				slider.setValue(media.getTimestamp());
 				updateTimestamp();
-				if (media.isPaused()) {
+				
+				if (media.isPaused() || media.getFileName() == null) {
 					playButton.setIcon(play);
 				} else {
 					playButton.setIcon(pause);
@@ -215,7 +216,7 @@ public class GUI extends JFrame {
 		openPList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				openPlaylist();
+				loadPlaylist();
 				refreshPlaylist();
 			}
 		});
@@ -535,22 +536,30 @@ public class GUI extends JFrame {
 		shiftUp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				int item = plist.getSelectedIndex();
-				if (item != 0)
-					playlist.swapPosition(item, item-1);
-				refreshPlaylist();
-				plist.setSelectedIndex(item-1);
+				try {
+					int item = plist.getSelectedIndex();
+					if (item != 0)
+						playlist.swapPosition(item, item-1);
+					refreshPlaylist();
+					plist.setSelectedIndex(item-1);
+				} catch (ArrayIndexOutOfBoundsException e) {
+					//Do nothing
+				}
 			}
 		});
 		
 		shiftDown.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				int item = plist.getSelectedIndex();
-				if (item != playlist.getSize()-1)
-					playlist.swapPosition(item, item+1);
-				refreshPlaylist();
-				plist.setSelectedIndex(item+1);
+				try {
+					int item = plist.getSelectedIndex();
+					if (item != playlist.getSize()-1)
+						playlist.swapPosition(item, item+1);
+					refreshPlaylist();
+					plist.setSelectedIndex(item+1);
+				} catch (ArrayIndexOutOfBoundsException e) {
+					//Do nothing
+				}
 			}
 		});
 	}
@@ -617,7 +626,7 @@ public class GUI extends JFrame {
 		loadPlaylistButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				openPlaylist();
+				loadPlaylist();
 				refreshPlaylist();
 			}
 
@@ -745,7 +754,7 @@ public class GUI extends JFrame {
 	}
 	
 	
-	private void openPlaylist() {
+	private void loadPlaylist() {
 		JFileChooser fileopen = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter("xml files", "xml");
         fileopen.addChoosableFileFilter(filter);
@@ -827,7 +836,6 @@ public class GUI extends JFrame {
             public void run() {
                 GUI gui = new GUI();
                 gui.setVisible(true);
-                gui.refreshPlaylist();
             }
         });
     }

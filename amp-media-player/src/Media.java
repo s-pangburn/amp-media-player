@@ -129,6 +129,7 @@ public class Media extends MediaPlayerEventAdapter {
 		player.playMedia(file);
 		looping = fastForwarding = false;
 		timeScale = 1;
+		paused = false;
 	}
 	
 	public void pause() {
