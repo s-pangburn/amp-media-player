@@ -10,6 +10,9 @@ Though the project is considered feature-complete, a number of bugs and extensio
 4. Currently no UI in fullscreen, also current implementation slightly buggy, but functional
 
 Libraries Used:
+
 Java Swing
+
 VLCJ
+
 Swing Range Slider Widget: https://github.com/ernieyu/Swing-range-slider
