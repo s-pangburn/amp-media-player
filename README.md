@@ -12,9 +12,9 @@ Though the project is considered feature-complete, a number of bugs and extensio
 
 <strong>Libraries Used:</strong>
 
-Java Swing
+Java Swing: http://en.wikipedia.org/wiki/Swing_%28Java%29
 
-VLCJ
+VLCJ: https://github.com/caprica/vlcj
 
 Swing Range Slider Widget: https://github.com/ernieyu/Swing-range-slider
 
