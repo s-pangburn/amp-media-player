@@ -51,6 +51,9 @@ public class GUI extends JFrame {
 
 	public Media media;
 	private Playlist playlist;
+
+	//GUI components
+	private Canvas display = new Canvas();
 	private JSlider slider;
 	private RangeSlider loopSlider;
 	private JToggleButton loopButton;
@@ -58,13 +61,14 @@ public class GUI extends JFrame {
 	private final JLabel listTitle = new JLabel("New Playlist");
 	private JList<String> plist;
 	private DefaultListModel list = new DefaultListModel();
+	
+	//Tracking variables
 	private File lastDirectory = null;
 	private Timestamp currentTime = new Timestamp((long) 0.0);
 	private Timestamp totalTime = new Timestamp ((long) 0.0);
 	private JLabel timeDisplay;
 
-	private Canvas display = new Canvas();
-	
+	//Icons
 	private Icon play = new ImageIcon("play.png");
 	private Icon pause = new ImageIcon("pause.png");
 	private Icon next = new ImageIcon("next.png");
@@ -78,9 +82,6 @@ public class GUI extends JFrame {
 	private Icon fullscreen = new ImageIcon("fullscreen.png");
 	private final JButton playButton = new JButton(play);
 	
-	/*
-	 * TODO: Implement rearrange (ME, MATT)
-	 */
 	
 	private class ToolBar extends JToolBar {
 		@Override
@@ -103,7 +104,6 @@ public class GUI extends JFrame {
 		drawControls();
 		drawMenu();
 		
-		
 		setTitle("AMP Media Player");
 		setMinimumSize(new Dimension(650, 420));
 		setLocationRelativeTo(null);
@@ -111,6 +111,8 @@ public class GUI extends JFrame {
 		
 		pack();
 		
+		
+		//Executes every frame - updates time stamp and handles skipping
 		Timer timer = new Timer(1, new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				slider.setValue(media.getTimestamp());
@@ -135,7 +137,7 @@ public class GUI extends JFrame {
 	
 	
 	private void drawMenu() {
-		JPopupMenu.setDefaultLightWeightPopupEnabled(false);  // Remedies overlapping glitch
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);  // Remedies overlapping glitch with menus
 		JMenuBar menu = new JMenuBar();
 		
 		JMenu file = new JMenu("File");
@@ -188,6 +190,8 @@ public class GUI extends JFrame {
 		
 		setJMenuBar(menu);
 
+		
+		//Open file
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -204,6 +208,8 @@ public class GUI extends JFrame {
 			
 		});
 		
+		
+		//Create new playlist
 		newPList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -213,6 +219,8 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		
+		//Open Playlist
 		openPList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -221,6 +229,8 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		
+		//Save Playlist
 		savePList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -228,6 +238,8 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		
+		//Delete Playlist
 		delPList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -238,6 +250,8 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		
+		//Quit program
 		quit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -245,6 +259,8 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		
+		//Add file to Playlist
 		addPList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -259,6 +275,8 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		
+		//Add current item to Playlist
 		addPList2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -271,6 +289,8 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		
+		//Fullscreen
 		fullscreen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -278,6 +298,8 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		
+		//Help >> About
 		about.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
@@ -467,7 +489,7 @@ public class GUI extends JFrame {
 		setConstraints(params, 8, 0, 1, 1, 0.1, 0, GridBagConstraints.LAST_LINE_START, GridBagConstraints.BOTH);
 		pane.add(blank1, params);
 		
-		//Rearrange buttons
+		//Rearrange playlist item buttons
 		ToolBar shiftBar = new ToolBar();
 		setConstraints(params, 7, 4, 1, 4, 0, 0, GridBagConstraints.LAST_LINE_END, GridBagConstraints.BOTH);
 		params.insets = new Insets(0, 9, 0, 10);
@@ -681,7 +703,7 @@ public class GUI extends JFrame {
 				            value = slider.getValue();
 				            break;
 				        }
-				        super.mousePressed(e); //isDragging = true;
+				        super.mousePressed(e); 
 				        super.mouseDragged(e);
 				      }
 				      @Override public void mouseDragged(MouseEvent e) {
@@ -694,9 +716,6 @@ public class GUI extends JFrame {
 				    	  media.setTimestamp(value);
 				    	  super.mouseReleased(e);
 				      }
-				      /*@Override public boolean shouldScroll(int direction) {
-				        return false;
-				      }*/
 				    };
 				  }
 		});
@@ -797,6 +816,7 @@ public class GUI extends JFrame {
 			totalTime.setTime(media.getLength() + 1000);
 			NumberFormat format = NumberFormat.getInstance();
 			format.setMinimumIntegerDigits(2);
+			
 			if (media.getLength() > 3600000) {
 				timeDisplay.setText((currentTime.getHours()-16) + ":" + format.format(currentTime.getMinutes()) + ":" + format.format(currentTime.getSeconds()) + 
 						"/" + (totalTime.getHours()-16) + ":" + format.format(totalTime.getMinutes()) + ":" + format.format(totalTime.getSeconds()));
